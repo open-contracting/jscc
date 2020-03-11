@@ -714,39 +714,8 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
             # Extensions aren't expected to repeat `required`. Packages don't have merge rules.
             errors += validate_null_type(path, data, allow_null=allow_null)
 
-            # Extensions aren't expected to repeat referenced codelist CSV files.
-            # TODO: This code assumes each schema uses all codelists. So, for now, skip package schema.
-            codelist_files = set()
-            for csvpath, reader in walk_csv_data(top):
-                parts = csvpath.replace(top, '').split(os.sep)  # maybe inelegant way to isolate consolidated extension
-                if is_codelist(reader) and (
-                        # Take all codelists in extensions.
-                        (is_extension and not is_profile) or
-                        # Take non-extension codelists in core, and non-core codelists in profiles.
-                        not any(c in parts for c in ('extensions', 'patched'))):
-                    name = os.path.basename(csvpath)
-                    if name.startswith(('+', '-')):
-                        if name[1:] not in external_codelists:
-                            errors += 1
-                            warnings.warn('ERROR: {} {} modifies non-existent codelist'.format(path, name))
-                    else:
-                        codelist_files.add(name)
+            errors += validate_codelist_files_used_in_schema(path, data, top, is_extension)
 
-            codelist_values = collect_codelist_values(path, data)
-            if is_extension:
-                all_codelist_files = codelist_files | external_codelists
-            else:
-                all_codelist_files = codelist_files
-
-            unused_codelists = [codelist for codelist in codelist_files if codelist not in codelist_values]
-            missing_codelists = [codelist for codelist in codelist_values if codelist not in all_codelist_files]
-
-            if unused_codelists:
-                errors += 1
-                warnings.warn('ERROR: {} has unused codelists: {}'.format(path, ', '.join(unused_codelists)))
-            if missing_codelists:
-                errors += 1
-                warnings.warn('ERROR: repository is missing codelists: {}'.format(', '.join(missing_codelists)))
     else:
         errors += validate_deep_properties(path, data)
 
