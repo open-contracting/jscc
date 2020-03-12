@@ -8,7 +8,6 @@ setup(
         'jsonref',
         'jsonschema',
         'pytest>=3.6',
-        'requests',
         'rfc3987',
         'strict-rfc3339',
     ],

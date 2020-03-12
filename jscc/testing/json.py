@@ -3,7 +3,6 @@ import os
 import re
 import warnings
 
-import requests
 from jsonref import JsonRef, JsonRefError
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
@@ -24,13 +23,6 @@ cwd = os.getcwd()
 repo_name = os.path.basename(os.environ.get('TRAVIS_REPO_SLUG', cwd))
 is_profile = os.path.isfile(os.path.join(cwd, 'Makefile')) and repo_name not in ('standard', 'infrastructure')
 is_extension = os.path.isfile(os.path.join(cwd, 'extension.json')) or is_profile
-
-url = 'https://raw.githubusercontent.com/open-contracting/standard/1.1/standard/schema/meta-schema.json'
-metaschema = requests.get(url).json()
-
-# Draft 6 removes `minItems` from `definitions/stringArray`.
-# See https://github.com/open-contracting-extensions/ocds_api_extension/blob/master/release-package-schema.json#L2
-del metaschema['definitions']['stringArray']['minItems']
 
 
 def validate_letter_case(*args):
@@ -560,16 +552,6 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
         errors += validate_deep_properties(path, data)
 
     assert errors == 0, 'One or more JSON Schema files are invalid. See warnings below.'
-
-
-def test_json_schema():
-    """
-    Ensures all JSON Schema files are valid JSON Schema Draft 4 and use codelists correctly. Unless this is an
-    extension, ensures JSON Schema files have required metadata and valid references.
-    """
-    for path, text, data in walk_json_data():
-        if is_json_schema(data):
-            validate_json_schema(path, data, metaschema)
 
 
 def get_invalid_files():
