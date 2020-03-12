@@ -1,18 +1,16 @@
-import csv
 import json
 import os
 import re
 import warnings
-from collections import UserDict
 
-import pytest
 import requests
 from jsonref import JsonRef, JsonRefError
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
-# Whether to use the 1.1-dev version of OCDS.
-use_development_version = False
+from jscc.testing.traversal import walk, walk_csv_data, walk_json_data
+from jscc.testing.util import (collect_codelist_values, difference, false, get_types, is_array_of_objects, is_codelist,
+                               is_json_schema, tracked, traverse, true)
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {
@@ -23,21 +21,8 @@ exceptional_extensions = (
 
 cwd = os.getcwd()
 repo_name = os.path.basename(os.environ.get('TRAVIS_REPO_SLUG', cwd))
-ocds_version = os.environ.get('OCDS_TEST_VERSION')
 is_profile = os.path.isfile(os.path.join(cwd, 'Makefile')) and repo_name not in ('standard', 'infrastructure')
 is_extension = os.path.isfile(os.path.join(cwd, 'extension.json')) or is_profile
-extensiondir = os.path.join(cwd, 'schema', 'profile') if is_profile else cwd
-
-if repo_name == 'infrastructure':
-    ocds_schema_base_url = 'https://standard.open-contracting.org/infrastructure/schema/'
-else:
-    ocds_schema_base_url = 'https://standard.open-contracting.org/schema/'
-development_base_url = 'https://raw.githubusercontent.com/open-contracting/standard/1.1-dev/standard/schema'
-ocds_tags = re.findall(r'\d+__\d+__\d+', requests.get(ocds_schema_base_url).text)
-if ocds_version:
-    ocds_tag = ocds_version.replace('.', '__')
-else:
-    ocds_tag = ocds_tags[-1]
 
 url = 'https://raw.githubusercontent.com/open-contracting/standard/1.1/standard/schema/meta-schema.json'
 metaschema = requests.get(url).json()
@@ -45,205 +30,6 @@ metaschema = requests.get(url).json()
 # Draft 6 removes `minItems` from `definitions/stringArray`.
 # See https://github.com/open-contracting-extensions/ocds_api_extension/blob/master/release-package-schema.json#L2
 del metaschema['definitions']['stringArray']['minItems']
-
-
-def custom_warning_formatter(message, category, filename, lineno, line=None):
-    return str(message).replace(cwd + os.sep, '')
-
-
-warnings.formatwarning = custom_warning_formatter
-
-class RejectingDict(UserDict):
-    """
-    Allows a key to be set at most once, in order to raise an error on duplicate keys in JSON.
-    """
-    def __setitem__(self, k, v):
-        # See https://tools.ietf.org/html/rfc7493#section-2.3
-        if k in self.keys():
-            raise ValueError('Key set more than once {}'.format(k))
-        else:
-            return super().__setitem__(k, v)
-
-
-def true():
-    return True
-
-
-def false():
-    return False
-
-
-def tracked(path):
-    """
-    Returns whether the path isn't typically untracked in Git repositories.
-    """
-    substrings = {
-        '.egg-info/',
-        '/.tox/',
-        '/.ve/',
-        '/htmlcov/',
-        '/node_modules/',
-    }
-
-    return not any(substring in path for substring in substrings)
-
-
-def warn_and_assert(paths, warn_message, assert_message):
-    """
-    If ``paths`` isn't empty, issues a warning for each path, and raises an assertion error.
-    """
-    success = True
-    for path in paths:
-        warnings.warn('ERROR: ' + warn_message.format(path=path))
-        success = False
-
-    assert success, assert_message
-
-
-def object_pairs_hook(pairs):
-    rejecting_dict = RejectingDict(pairs)
-    # We return the wrapped dict, not the RejectingDict itself, because jsonschema checks the type.
-    return rejecting_dict.data
-
-
-def walk(top=cwd):
-    """
-    Yields all files, except third-party files under virtual environment, static, build, and test fixture directories.
-    """
-    for root, dirs, files in os.walk(top):
-        for directory in ('.git', '.ve', '_static', 'build', 'fixtures'):
-            if directory in dirs:
-                dirs.remove(directory)
-        for name in files:
-            yield (root, name)
-
-
-def walk_json_data(top=cwd):
-    """
-    Yields all JSON data.
-    """
-    for root, name in walk(top):
-        if name.endswith('.json'):
-            path = os.path.join(root, name)
-            with open(path) as f:
-                text = f.read()
-                if text:
-                    # Handle unreleased tag in $ref.
-                    match = re.search(r'\d+__\d+__\d+', text)
-                    if match:
-                        tag = match.group(0)
-                        if tag not in ocds_tags:
-                            if ocds_version or not use_development_version:
-                                text = text.replace(tag, ocds_tag)
-                            else:
-                                text = text.replace(ocds_schema_base_url + tag, development_base_url)
-                    try:
-                        yield (path, text, json.loads(text, object_pairs_hook=object_pairs_hook))
-                    except json.decoder.JSONDecodeError as e:
-                        # TODO assert False, '{} is not valid JSON ({})'.format(path, e)
-                        pass
-
-
-def walk_csv_data(top=cwd):
-    """
-    Yields all CSV data.
-    """
-    for root, name in walk(top):
-        if name.endswith('.csv'):
-            path = os.path.join(root, name)
-            with open(path, newline='') as f:
-                yield (path, csv.DictReader(f))
-
-
-def is_json_schema(data):
-    """
-    Returns whether the data is a JSON Schema.
-    """
-    return '$schema' in data or 'definitions' in data or 'properties' in data
-
-
-def is_codelist(reader):
-    """
-    Returns whether the CSV is a codelist.
-    """
-    return 'Code' in reader.fieldnames
-
-
-def is_array_of_objects(data):
-    """
-    Returns whether the field is an array of objects.
-    """
-    return 'array' in data.get('type', []) and any(key in data.get('items', {}) for key in ('$ref', 'properties'))
-
-
-def get_types(data):
-    """
-    Returns a field's `type` as a list.
-    """
-    if 'type' not in data:
-        return []
-    if isinstance(data['type'], str):
-        return [data['type']]
-    return data['type']
-
-
-def collect_codelist_values(path, data, pointer=''):
-    """
-    Collects `codelist` values from JSON Schema.
-    """
-    codelists = set()
-
-    if isinstance(data, list):
-        for index, item in enumerate(data):
-            codelists.update(collect_codelist_values(path, item, pointer='{}/{}'.format(pointer, index)))
-    elif isinstance(data, dict):
-        if 'codelist' in data:
-            codelists.add(data['codelist'])
-
-        for key, value in data.items():
-            codelists.update(collect_codelist_values(path, value, pointer='{}/{}'.format(pointer, key)))
-
-    return codelists
-
-
-def difference(actual, expected):
-    """
-    Returns strings describing the differences between actual and expected values.
-    """
-    added = actual - expected
-    if added:
-        added = '; added {}'.format(added)
-    else:
-        added = ''
-
-    removed = expected - actual
-    if removed:
-        removed = '; removed {}'.format(removed)
-    else:
-        removed = ''
-
-    return added, removed
-
-
-def traverse(block):
-    """
-    Implements common logic used by methods below.
-    """
-    def method(path, data, pointer=''):
-        errors = 0
-
-        if isinstance(data, list):
-            for index, item in enumerate(data):
-                errors += method(path, item, pointer='{}/{}'.format(pointer, index))
-        elif isinstance(data, dict):
-            errors += block(path, data, pointer)
-
-            for key, value in data.items():
-                errors += method(path, value, pointer='{}/{}'.format(pointer, key))
-
-        return errors
-
-    return method
 
 
 def validate_letter_case(*args):
