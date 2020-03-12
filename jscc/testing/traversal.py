@@ -2,10 +2,8 @@ import csv
 import json
 import os
 
-cwd = os.getcwd()  # TODO
 
-
-def walk(top=cwd, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
+def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
     """
     Walks a directory tree, and yields tuples consistent of a file path and file name, excluding Git files and
     third-party files under virtual environment, static, build, and test fixture directories (by default).
@@ -13,6 +11,9 @@ def walk(top=cwd, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
     :param str top: the file path of the directory tree
     :param tuple exclude: override the directories to exclude
     """
+    if not top:
+        top = os.getcwd()
+
     for root, dirs, files in os.walk(top):
         for directory in excluded:
             if directory in dirs:
