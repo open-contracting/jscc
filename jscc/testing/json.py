@@ -66,6 +66,14 @@ class RejectingDict(UserDict):
             return super().__setitem__(k, v)
 
 
+def true():
+    return True
+
+
+def false():
+    return False
+
+
 def object_pairs_hook(pairs):
     rejecting_dict = RejectingDict(pairs)
     # We return the wrapped dict, not the RejectingDict itself, because jsonschema checks the type.
@@ -763,77 +771,32 @@ def test_json_schema():
             validate_json_schema(path, data, metaschema)
 
 
-def test_empty_files():
+def check_empty_files(include=true, parse_as_json=false):
     """
-    Ensures a repository has no empty files and an extension has no versioned-release-validation-schema.json file.
-    """
-    basenames = (
-        '.keep',
-        'record-package-schema.json',
-        'release-package-schema.json',
-        'release-schema.json',
-    )
+    Asserts on the first file that is empty.
 
-    # Some files raise UnicodeDecodeError exceptions.
-    path_exceptions = {
-        # Files
-        '.DS_Store',
-        'cache.sqlite',
-        'chromedriver',
-        'chromedriver_linux64.zip',
-        'chromedriver_mac64.zip',
-        # Python
-        '.ve',
-        '__init__.py',
-        # Python packages
-        'dependency_links.txt',
-    }
-    extension_exceptions = {
-        # Excel
-        '.xlsx',
-        # Fonts
-        '.eot',
-        '.ttf',
-        '.woff',
-        '.woff2',
-        # Gettext
-        '.mo',
-        # Images
-        '.ico',
-        '.jpg',
-        '.png',
-        # Packages
-        '.deb',
-        # Python
-        '.pyc',
-        # Python packages
-        '.gz',
-        # Sphinx
-        '.doctree',
-        '.inv',
-        '.pickle',
-        # Editor temporary files
-        '.swp',
-    }
+    If the file's contents are parsed as JSON, it is empty if the JSON is falsy. Otherwise, the file is empty if it
+    contains only whitespace.
+
+    :param include function: A method that returns whether to test the file (default true).
+    :param parse_as_json function: A method that returns whether to parse the file's contents as JSON (default false).
+    """
+    message = '{} is empty and should be removed'
 
     for root, name in walk():
         path = os.path.join(root, name)
-        parts = path.split(os.sep)
 
-        if is_extension and name == 'versioned-release-validation-schema.json':
-            assert False, 'versioned-release-validation-schema.json should be removed'
-        elif not any(e in parts for e in path_exceptions) and os.path.splitext(name)[1] not in extension_exceptions:
+        if include(path, name):
             try:
                 with open(path) as f:
                     text = f.read()
-            except UnicodeDecodeError as e:
-                assert False, 'UnicodeDecodeError: {} {}'.format(e, path)
-            if name in basenames:
-                # Exception: Templates are allowed to have empty schema files.
-                if repo_name not in ('standard_extension_template', 'standard_profile_template'):
-                    try:
-                        assert json.loads(text), '{} is empty and should be removed'.format(path)
-                    except json.decoder.JSONDecodeError as e:
-                        assert False, '{} is not valid JSON ({})'.format(path, e)
+            except UnicodeDecodeError:
+                continue  # the file is non-empty, and might be binary
+
+            if parse_as_json(path, name):
+                try:
+                    assert json.loads(text), message.format(path)
+                except json.decoder.JSONDecodeError:
+                    continue  # the file is non-empty
             else:
-                assert text.strip(), '{} is empty and should be removed'.format(path)
+                assert text.strip(), message.format(path)
