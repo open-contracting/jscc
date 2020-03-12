@@ -7,6 +7,13 @@ def is_json_schema(data):
     return '$schema' in data or 'definitions' in data or 'properties' in data
 
 
+def is_json_merge_patch(data):
+    """
+    Returns whether the data is a JSON Merge Patch.
+    """
+    return '$schema' not in data and ('definitions' in data or 'properties' in data)
+
+
 def is_array_of_objects(field):
     """
     Returns whether a field is an array of objects.
