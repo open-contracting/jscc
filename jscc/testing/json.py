@@ -8,9 +8,10 @@ from jsonref import JsonRef, JsonRefError
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
+from jscc.exceptions import DuplicateKeyError
 from jscc.testing.schema import get_types, is_array_of_objects, is_json_schema, traverse
 from jscc.testing.traversal import walk, walk_csv_data, walk_json_data
-from jscc.testing.util import difference, false, is_codelist, tracked, true
+from jscc.testing.util import difference, false, is_codelist, rejecting_dict, tracked, true
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {
@@ -571,12 +572,21 @@ def test_json_schema():
             validate_json_schema(path, data, metaschema)
 
 
-def test_valid():
+def get_invalid_files():
     """
-    Ensures all JSON files are valid.
+    Yields the path and exception of any JSON file that isn't valid.
     """
-    for path, text, data in walk_json_data():
-        pass  # fails if the JSON can't be read
+    for root, name in walk():
+        if name.endswith('.json'):
+            path = os.path.join(root, name)
+
+            with open(path) as f:
+                text = f.read()
+                if text:
+                    try:
+                        json.loads(text, object_pairs_hook=rejecting_dict)
+                    except (json.decoder.JSONDecodeError, DuplicateKeyError) as e:
+                        yield path, e
 
 
 def get_unindented_files(include=true):

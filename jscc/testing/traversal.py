@@ -2,9 +2,10 @@ import csv
 import json
 import os
 import re
-from collections import UserDict
 
 import requests
+
+from jscc.testing.util import rejecting_dict
 
 # Whether to use the 1.1-dev version of OCDS.
 use_development_version = False
@@ -28,41 +29,27 @@ else:
     ocds_tag = ocds_tags[-1]
 
 
-class RejectingDict(UserDict):
+def walk(top=cwd, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
     """
-    Allows a key to be set at most once, in order to raise an error on duplicate keys in JSON.
-    """
-    def __setitem__(self, k, v):
-        # See https://tools.ietf.org/html/rfc7493#section-2.3
-        if k in self.keys():
-            raise ValueError('Key set more than once {}'.format(k))
-        else:
-            return super().__setitem__(k, v)
+    Walks a directory tree, and yields tuples consistent of a file path and file name, excluding Git files and
+    third-party files under virtual environment, static, build, and test fixture directories (by default).
 
-
-def object_pairs_hook(pairs):
-    rejecting_dict = RejectingDict(pairs)
-    # We return the wrapped dict, not the RejectingDict itself, because jsonschema checks the type.
-    return rejecting_dict.data
-
-
-def walk(top=cwd):
-    """
-    Yields all files, except third-party files under virtual environment, static, build, and test fixture directories.
+    :param str top: the file path of the directory tree
+    :param tuple exclude: override the directories to exclude
     """
     for root, dirs, files in os.walk(top):
-        for directory in ('.git', '.ve', '_static', 'build', 'fixtures'):
+        for directory in excluded:
             if directory in dirs:
                 dirs.remove(directory)
         for name in files:
-            yield (root, name)
+            yield root, name
 
 
-def walk_json_data(top=cwd):
+def walk_json_data(**kwargs):
     """
-    Yields all JSON data.
+    Walks a directory tree, and yields tuples consisting of a file path, text content, and JSON data.
     """
-    for root, name in walk(top):
+    for root, name in walk(**kwargs):
         if name.endswith('.json'):
             path = os.path.join(root, name)
             with open(path) as f:
@@ -78,18 +65,17 @@ def walk_json_data(top=cwd):
                             else:
                                 text = text.replace(ocds_schema_base_url + tag, development_base_url)
                     try:
-                        yield (path, text, json.loads(text, object_pairs_hook=object_pairs_hook))
-                    except json.decoder.JSONDecodeError as e:
-                        # TODO assert False, '{} is not valid JSON ({})'.format(path, e)
-                        pass
+                        yield path, text, json.loads(text, object_pairs_hook=rejecting_dict)
+                    except json.decoder.JSONDecodeError:
+                        continue
 
 
-def walk_csv_data(top=cwd):
+def walk_csv_data(**kwargs):
     """
-    Yields all CSV data.
+    Walks a directory tree, and yields tuples consisting of a file path and CSV reader.
     """
-    for root, name in walk(top):
+    for root, name in walk(**kwargs):
         if name.endswith('.csv'):
             path = os.path.join(root, name)
             with open(path, newline='') as f:
-                yield (path, csv.DictReader(f))
+                yield path, csv.DictReader(f)
