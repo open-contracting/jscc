@@ -615,7 +615,7 @@ def get_empty_files(include=true, parse_as_json=false):
     for root, name in walk():
         path = os.path.join(root, name)
 
-        if tracked(path) and include(path, name):
+        if tracked(path) and include(path, name) and name != '__init__.py':
             try:
                 with open(path) as f:
                     text = f.read()
