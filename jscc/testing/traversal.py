@@ -1,32 +1,8 @@
 import csv
 import json
 import os
-import re
 
-import requests
-
-from jscc.testing.util import rejecting_dict
-
-# Whether to use the 1.1-dev version of OCDS.
-use_development_version = False
-
-cwd = os.getcwd()
-
-repo_name = os.path.basename(os.environ.get('TRAVIS_REPO_SLUG', cwd))
-
-ocds_version = os.environ.get('OCDS_TEST_VERSION')
-
-if repo_name == 'infrastructure':
-    ocds_schema_base_url = 'https://standard.open-contracting.org/infrastructure/schema/'
-else:
-    ocds_schema_base_url = 'https://standard.open-contracting.org/schema/'
-development_base_url = 'https://raw.githubusercontent.com/open-contracting/standard/1.1-dev/standard/schema'
-
-ocds_tags = re.findall(r'\d+__\d+__\d+', requests.get(ocds_schema_base_url).text)
-if ocds_version:
-    ocds_tag = ocds_version.replace('.', '__')
-else:
-    ocds_tag = ocds_tags[-1]
+cwd = os.getcwd()  # TODO
 
 
 def walk(top=cwd, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
@@ -45,7 +21,7 @@ def walk(top=cwd, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
             yield root, name
 
 
-def walk_json_data(**kwargs):
+def walk_json_data(patch=None, **kwargs):
     """
     Walks a directory tree, and yields tuples consisting of a file path, text content, and JSON data.
     """
@@ -55,17 +31,10 @@ def walk_json_data(**kwargs):
             with open(path) as f:
                 text = f.read()
                 if text:
-                    # Handle unreleased tag in $ref.
-                    match = re.search(r'\d+__\d+__\d+', text)
-                    if match:
-                        tag = match.group(0)
-                        if tag not in ocds_tags:
-                            if ocds_version or not use_development_version:
-                                text = text.replace(tag, ocds_tag)
-                            else:
-                                text = text.replace(ocds_schema_base_url + tag, development_base_url)
+                    if patch:
+                        text = patch(text)
                     try:
-                        yield path, text, json.loads(text, object_pairs_hook=rejecting_dict)
+                        yield path, text, json.loads(text)
                     except json.decoder.JSONDecodeError:
                         continue
 

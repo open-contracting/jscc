@@ -579,7 +579,6 @@ def get_invalid_files():
     for root, name in walk():
         if name.endswith('.json'):
             path = os.path.join(root, name)
-
             with open(path) as f:
                 text = f.read()
                 if text:
@@ -589,11 +588,11 @@ def get_invalid_files():
                         yield path, e
 
 
-def get_unindented_files(include=true):
+def get_unindented_files(include=true, patch=None):
     """
     Yields the path of any JSON file that isn't formatted for humans.
     """
-    for path, text, data in walk_json_data():
+    for path, text, data in walk_json_data(patch):
         name = os.path.basename(path)
 
         if tracked(path) and include(path, name):
