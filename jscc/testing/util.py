@@ -3,6 +3,14 @@ from collections import UserDict
 
 from jscc.exceptions import DuplicateKeyError
 
+untracked = {
+    '.egg-info/',
+    '/.tox/',
+    '/.ve/',
+    '/htmlcov/',
+    '/node_modules/',
+}
+
 
 def tracked(path):
     """
@@ -10,15 +18,7 @@ def tracked(path):
 
     :param str path: a file path
     """
-    substrings = {
-        '.egg-info/',
-        '/.tox/',
-        '/.ve/',
-        '/htmlcov/',
-        '/node_modules/',
-    }
-
-    return not any(substring in path for substring in substrings)
+    return not any(substring in path for substring in untracked)
 
 
 def is_codelist(reader):
@@ -27,7 +27,7 @@ def is_codelist(reader):
 
     :param csv.DictReader reader: A CSV reader
     """
-    return 'Code' in reader.fieldnames
+    return 'Code' in reader.fieldnames  # TODO
 
 
 class RejectingDict(UserDict):
