@@ -1,5 +1,8 @@
 import warnings
 from collections import UserDict
+from functools import lru_cache
+
+import requests
 
 from jscc.exceptions import DuplicateKeyError
 
@@ -10,6 +13,16 @@ untracked = {
     '/htmlcov/',
     '/node_modules/',
 }
+
+
+@lru_cache()
+def http_get(url):
+    return requests.get(url)
+
+
+@lru_cache()
+def http_head(url):
+    return requests.head(url)
 
 
 def tracked(path):

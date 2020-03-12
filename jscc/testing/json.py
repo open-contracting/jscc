@@ -53,7 +53,7 @@ def validate_letter_case(*args):
     return traverse(block)(*args)
 
 
-def validate_title_description_type(*args):
+def validate_title_description_type(*args):  # OCDS-only
     """
     Prints and returns the number of errors relating to metadata in a JSON Schema.
     """
@@ -89,7 +89,7 @@ def validate_title_description_type(*args):
     return traverse(block)(*args)
 
 
-def validate_null_type(path, data, pointer='', allow_null=True, should_be_nullable=True):
+def validate_null_type(path, data, pointer='', allow_null=True, should_be_nullable=True):  # OCDS-only
     """
     Prints and returns the number of errors relating to non-nullable optional fields and nullable required fields.
     """
@@ -165,7 +165,7 @@ def validate_null_type(path, data, pointer='', allow_null=True, should_be_nullab
     return errors
 
 
-def validate_codelist_enum(*args):
+def validate_codelist_enum(*args):  # OCDS-only
     """
     Prints and returns the number of errors relating to codelists in a JSON Schema.
     """
@@ -307,7 +307,7 @@ def validate_deep_properties(*args):
     return traverse(block)(*args)
 
 
-def validate_object_id(*args):
+def validate_object_id(*args):  # OCDS-only
     """
     Prints and returns the number of errors relating to objects within arrays lacking `id` fields.
     """
@@ -404,7 +404,7 @@ def validate_merge_properties(*args):
     return traverse(block)(*args)
 
 
-def validate_ref(path, data):
+def validate_ref(path, data):  # OCDS-only
     ref = JsonRef.replace_refs(data)
 
     try:
@@ -417,7 +417,7 @@ def validate_ref(path, data):
     return 0
 
 
-def validate_codelist_files_used_in_schema(path, data, top, is_extension):
+def validate_codelist_files_used_in_schema(path, data, top, is_extension):  # OCDS-only
     def collect_codelist_values(path, data, pointer=''):
         """
         Collects `codelist` values from JSON Schema.
@@ -511,7 +511,7 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
     if errors:
         warnings.warn('ERROR: {} is not valid JSON Schema ({} errors)'.format(path, errors))
 
-    if all(basename not in path for basename in exceptions):
+    if os.path.basename(path) not in exceptions:
         kwargs = {}
         if 'versioned-release-validation-schema.json' in path:
             kwargs['additional_valid_types'] = ['object']
@@ -536,13 +536,13 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
         # Extensions aren't expected to repeat referenced `definitions`.
         errors += validate_ref(path, data)
 
-        if all(basename not in path for basename in exceptions_plus_versioned):
+        if os.path.basename(path) not in exceptions_plus_versioned:
             # Extensions aren't expected to repeat `title`, `description`, `type`.
             errors += validate_title_description_type(path, data)
             # Extensions aren't expected to repeat referenced `definitions`.
             errors += validate_object_id(path, JsonRef.replace_refs(data))
 
-        if all(basename not in path for basename in exceptions_plus_versioned_and_packages):
+        if os.path.basename(path) not in exceptions_plus_versioned_and_packages:
             # Extensions aren't expected to repeat `required`. Packages don't have merge rules.
             errors += validate_null_type(path, data, allow_null=allow_null)
 
