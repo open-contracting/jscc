@@ -8,9 +8,9 @@ from jsonref import JsonRef, JsonRefError
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
+from jscc.testing.schema import get_types, is_array_of_objects, is_json_schema, traverse
 from jscc.testing.traversal import walk, walk_csv_data, walk_json_data
-from jscc.testing.util import (collect_codelist_values, difference, false, get_types, is_array_of_objects, is_codelist,
-                               is_json_schema, tracked, traverse, true)
+from jscc.testing.util import difference, false, is_codelist, tracked, true
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {
@@ -425,6 +425,24 @@ def validate_ref(path, data):
 
 
 def validate_codelist_files_used_in_schema(path, data, top, is_extension):
+    def collect_codelist_values(path, data, pointer=''):
+        """
+        Collects `codelist` values from JSON Schema.
+        """
+        codelists = set()
+
+        if isinstance(data, list):
+            for index, item in enumerate(data):
+                codelists.update(collect_codelist_values(path, item, pointer='{}/{}'.format(pointer, index)))
+        elif isinstance(data, dict):
+            if 'codelist' in data:
+                codelists.add(data['codelist'])
+
+            for key, value in data.items():
+                codelists.update(collect_codelist_values(path, value, pointer='{}/{}'.format(pointer, key)))
+
+        return codelists
+
     errors = 0
 
     # Extensions aren't expected to repeat referenced codelist CSV files.
@@ -543,6 +561,16 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
     assert errors == 0, 'One or more JSON Schema files are invalid. See warnings below.'
 
 
+def test_json_schema():
+    """
+    Ensures all JSON Schema files are valid JSON Schema Draft 4 and use codelists correctly. Unless this is an
+    extension, ensures JSON Schema files have required metadata and valid references.
+    """
+    for path, text, data in walk_json_data():
+        if is_json_schema(data):
+            validate_json_schema(path, data, metaschema)
+
+
 def test_valid():
     """
     Ensures all JSON files are valid.
@@ -564,16 +592,6 @@ def get_unindented_files(include=true):
                 yield path
 
 
-def test_json_schema():
-    """
-    Ensures all JSON Schema files are valid JSON Schema Draft 4 and use codelists correctly. Unless this is an
-    extension, ensures JSON Schema files have required metadata and valid references.
-    """
-    for path, text, data in walk_json_data():
-        if is_json_schema(data):
-            validate_json_schema(path, data, metaschema)
-
-
 def get_empty_files(include=true, parse_as_json=false):
     """
     Yields the path of any file that is empty.
@@ -581,8 +599,8 @@ def get_empty_files(include=true, parse_as_json=false):
     If the file's contents are parsed as JSON, it is empty if the JSON is falsy. Otherwise, the file is empty if it
     contains only whitespace.
 
-    :param include function: A method that returns whether to test the file (default true).
-    :param parse_as_json function: A method that returns whether to parse the file's contents as JSON (default false).
+    :param function include: A method that returns whether to test the file (default true).
+    :param function parse_as_json: A method that returns whether to parse the file's contents as JSON (default false).
     """
     for root, name in walk():
         path = os.path.join(root, name)
