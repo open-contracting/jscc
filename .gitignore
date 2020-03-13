@@ -1,4 +1,7 @@
-/.ve
-__pycache__
-*.egg-info
 *.swp
+__pycache__
+/.coverage
+/.ve
+/dist
+/docs/_build
+/jscc.egg-info

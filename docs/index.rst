@@ -1,20 +1,18 @@
-.. JSON Schema and CSV Codelists documentation master file, created by
-   sphinx-quickstart on Thu Mar 12 22:28:55 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+JSON Schema and CSV Codelists (JSCC)
+====================================
 
-Welcome to JSON Schema and CSV Codelists's documentation!
-=========================================================
+.. include:: ../README.rst
+
+API
+---
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   api/testing/checks
+   api/testing/schema
+   api/testing/traversal
+   api/testing/util
+   api/exceptions
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Copyright (c) 2020 Open Contracting Partnership and Open Data Services Co-operative Limited, released under the BSD license
