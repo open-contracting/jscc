@@ -2,6 +2,14 @@ import csv
 import json
 import os
 
+untracked = {
+    '.egg-info/',
+    '/.tox/',
+    '/.ve/',
+    '/htmlcov/',
+    '/node_modules/',
+}
+
 
 def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
     """
@@ -53,3 +61,12 @@ def walk_csv_data(**kwargs):
         if path.endswith('.csv'):
             with open(path, newline='') as f:
                 yield path, name, csv.DictReader(f)
+
+
+def tracked(path):
+    """
+    Returns whether the path isn't typically untracked in Git repositories.
+
+    :param str path: a file path
+    """
+    return not any(substring in path for substring in untracked)

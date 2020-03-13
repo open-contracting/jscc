@@ -8,9 +8,9 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.schema import get_types, is_array_of_objects, is_codelist
-from jscc.testing.filesystem import walk, walk_csv_data, walk_json_data
-from jscc.testing.util import difference, false, rejecting_dict, tracked, true
+from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, rejecting_dict
+from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
+from jscc.testing.util import difference, false, true
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {

@@ -6,14 +6,6 @@ import requests
 
 from jscc.exceptions import DuplicateKeyError
 
-untracked = {
-    '.egg-info/',
-    '/.tox/',
-    '/.ve/',
-    '/htmlcov/',
-    '/node_modules/',
-}
-
 
 @lru_cache()
 def http_get(url):
@@ -33,34 +25,6 @@ def http_head(url):
     :param str url: the URL to request
     """
     return requests.head(url)
-
-
-def tracked(path):
-    """
-    Returns whether the path isn't typically untracked in Git repositories.
-
-    :param str path: a file path
-    """
-    return not any(substring in path for substring in untracked)
-
-
-class RejectingDict(UserDict):
-    """
-    A ``dict`` that raises an error if a key is set more than once.
-    """
-    # See https://tools.ietf.org/html/rfc7493#section-2.3
-    def __setitem__(self, k, v):
-        if k in self:
-            raise DuplicateKeyError(k)
-        return super().__setitem__(k, v)
-
-
-def rejecting_dict(pairs):
-    """
-    An ``object_pairs_hook`` method that allows a key to be set at most once.
-    """
-    # Return the wrapped dict, not the RejectingDict itself, because jsonschema checks the type.
-    return RejectingDict(pairs).data
 
 
 def difference(actual, expected):
