@@ -7,7 +7,9 @@ env:
   - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
 install:
   - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
-  # Install from tmp dir, otherwise jscc.egg-info causes errors
-  - cp -r . /tmp/jscc; pip install -e /tmp/jscc
+  - pip install .[test]
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
+  - pytest --cov jscc
+after_success:
+  coveralls
