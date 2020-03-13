@@ -45,12 +45,13 @@ def is_array_of_objects(field):
 
 def is_property_missing(field, prop):
     """
-    Returns whether a field's property isn't set, is falsy or is whitespace.
+    Returns whether a field's property isn't set, is empty, or is whitespace.
 
     :param dict field: the field
     :param str prop: the property
     """
-    return prop not in field or not field[prop] or not field[prop].strip()
+    return prop not in field or not field[prop] and not isinstance(field[prop], (bool, int, float)) or \
+        isinstance(field[prop], str) and not field[prop].strip()
 
 
 def get_types(field):

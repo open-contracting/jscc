@@ -54,8 +54,8 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, is_property_missing, rejecting_dict
 from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
+from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, is_property_missing, rejecting_dict
 from jscc.testing.util import difference
 
 

@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "metadata": {
+      "title": "",
+      "description": "\n \r \t",
+      "default": null,
+      "items": {},
+      "minimum": 0,
+      "maximum": 0.0,
+      "additionalItems": false
+    },
+    "arrayProperties": {
+      "type": "array",
+      "items": {
+        "properties": {}
+      }
+    },
+    "arrayRef": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Object"
+      }
+    },
+    "arrayType": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "mixed": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "definitions": {
+    "Object": {}
+  }
+}

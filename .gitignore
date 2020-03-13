@@ -2,6 +2,7 @@
 __pycache__
 /.coverage
 /.ve
-/dist
 /docs/_build
+/dist
+/htmlcov
 /jscc.egg-info
