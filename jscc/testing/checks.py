@@ -8,9 +8,9 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.schema import get_types, is_array_of_objects, traverse
-from jscc.testing.traversal import walk, walk_csv_data, walk_json_data
-from jscc.testing.util import difference, false, is_codelist, rejecting_dict, tracked, true
+from jscc.testing.schema import get_types, is_array_of_objects, is_codelist
+from jscc.testing.filesystem import walk, walk_csv_data, walk_json_data
+from jscc.testing.util import difference, false, rejecting_dict, tracked, true
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {
@@ -167,7 +167,7 @@ def validate_letter_case(*args):
 
         return errors
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_title_description_type(*args):  # OCDS-only
@@ -203,7 +203,7 @@ def validate_title_description_type(*args):  # OCDS-only
 
         return errors
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_null_type(path, data, pointer='', allow_null=True, should_be_nullable=True):  # OCDS-only
@@ -359,7 +359,7 @@ def validate_codelist_enum(*args):  # OCDS-only
 
         return errors
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_items_type(path, data, additional_valid_types=None):
@@ -396,7 +396,7 @@ def validate_items_type(path, data, additional_valid_types=None):
 
         return errors
 
-    return traverse(block)(path, data)
+    return _traverse(block)(path, data)
 
 
 def validate_deep_properties(*args):
@@ -421,7 +421,7 @@ def validate_deep_properties(*args):
 
         return 0
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_object_id(*args):  # OCDS-only
@@ -486,7 +486,7 @@ def validate_object_id(*args):  # OCDS-only
 
         return errors
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_merge_properties(*args):
@@ -518,7 +518,7 @@ def validate_merge_properties(*args):
 
         return errors
 
-    return traverse(block)(*args)
+    return _traverse(block)(*args)
 
 
 def validate_ref(path, data):  # OCDS-only
@@ -660,3 +660,24 @@ def validate_json_schema(path, name, data, schema, full_schema=not is_extension,
         errors += validate_deep_properties(path, data)
 
     assert errors == 0, 'One or more JSON Schema files are invalid. See warnings below.'
+
+
+def _traverse(block):
+    """
+    Implements common logic used by ``validate_*`` methods.
+    """
+    def method(path, data, pointer=''):
+        errors = 0
+
+        if isinstance(data, list):
+            for index, item in enumerate(data):
+                errors += method(path, item, pointer='{}/{}'.format(pointer, index))
+        elif isinstance(data, dict):
+            errors += block(path, data, pointer)
+
+            for key, value in data.items():
+                errors += method(path, value, pointer='{}/{}'.format(pointer, key))
+
+        return errors
+
+    return method

@@ -44,15 +44,6 @@ def tracked(path):
     return not any(substring in path for substring in untracked)
 
 
-def is_codelist(reader):
-    """
-    Returns whether the CSV is a codelist.
-
-    :param csv.DictReader reader: A CSV reader
-    """
-    return 'Code' in reader.fieldnames  # TODO
-
-
 class RejectingDict(UserDict):
     """
     A ``dict`` that raises an error if a key is set more than once.

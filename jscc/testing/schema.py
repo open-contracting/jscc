@@ -1,3 +1,12 @@
+def is_codelist(reader):
+    """
+    Returns whether the CSV is a codelist.
+
+    :param csv.DictReader reader: A CSV reader
+    """
+    return 'Code' in reader.fieldnames  # TODO
+
+
 def is_json_schema(data):
     """
     Returns whether the JSON data is a JSON Schema.
@@ -36,24 +45,3 @@ def get_types(field):
     if isinstance(field['type'], str):
         return [field['type']]
     return field['type']
-
-
-def traverse(block):
-    """
-    Implements common logic used by ``validate_*`` methods.
-    """
-    def method(path, data, pointer=''):
-        errors = 0
-
-        if isinstance(data, list):
-            for index, item in enumerate(data):
-                errors += method(path, item, pointer='{}/{}'.format(pointer, index))
-        elif isinstance(data, dict):
-            errors += block(path, data, pointer)
-
-            for key, value in data.items():
-                errors += method(path, value, pointer='{}/{}'.format(pointer, key))
-
-        return errors
-
-    return method

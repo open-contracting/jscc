@@ -11,7 +11,7 @@ API
 
    api/testing/checks
    api/testing/schema
-   api/testing/traversal
+   api/testing/filesystem
    api/testing/util
    api/exceptions
 
