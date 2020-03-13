@@ -1,5 +1,47 @@
 """
-Methods that directly support the validation of JSON Schema and CSV codelists.
+This module offers ``get_*`` methods to check for empty files, misindented JSON files, and invalid JSON files. See "pytest examples" for usage examples.
+
+This module also offers ``validate_*`` methods to test JSON Schema. Each method's behavior is customizable, and not all methods are relevant to all schema.
+
+The typical usage is to first define a test method like so:
+
+.. code-block:: python
+
+   from jscc.testing.filesystem import walk_json_data
+   from jscc.testing.schema import is_json_schema
+   from jscc.testing.util import http_get
+
+   schemas = [(path, name, data) for path, name, _, data in walk_json_data(patch) if is_json_schema(data)]
+   metaschema = http_get('http://json-schema.org/draft-04/schema').json()
+
+   @pytest.mark.parametrize('path,name,data', schemas)
+   def test_schema_valid(path, name, data):
+       validate_json_schema(path, name, data, metaschema)
+
+You can edit ``metaschema`` to be more strict and/or to add new properties. Then, define the ``validate_json_schema`` method that uses the ``validate_*`` methods. For example:
+
+.. code-block:: python
+
+   from jsonref import JsonRef
+   from jscc.testing.schema import (validate_codelist_enum, validate_deep_properties, validate_items_type,
+                                    validate_letter_case, validate_merge_properties, validate_metadata_presence,
+                                    validate_null_type, validate_object_id, validate_ref, validate_schema)
+
+   def validate_json_schema(path, name, data, schema):
+       errors = 0
+
+       errors += validate_schema(path, data, schema)
+       errors += validate_items_type(path, data)
+       errors += validate_codelist_enum(path, data)
+       errors += validate_letter_case(path, data)
+       errors += validate_merge_properties(path, data)
+       errors += validate_ref(path, data)
+       errors += validate_metadata_presence(path, data)
+       errors += validate_object_id(path, JsonRef.replace_refs(data))
+       errors += validate_null_type(path, data)
+       errors += validate_deep_properties(path, data)
+
+       assert not errors, 'One or more JSON Schema files are invalid. See warnings below.'
 """  # noqa
 
 import json
