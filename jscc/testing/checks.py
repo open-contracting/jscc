@@ -25,6 +25,123 @@ is_profile = os.path.isfile(os.path.join(cwd, 'Makefile')) and repo_name not in 
 is_extension = os.path.isfile(os.path.join(cwd, 'extension.json')) or is_profile
 
 
+def get_empty_files(include=true, parse_as_json=false):
+    """
+    Yields the path (as a tuple) of any file that is empty.
+
+    If the file's contents are parsed as JSON, it is empty if the JSON is falsy. Otherwise, the file is empty if it
+    contains only whitespace.
+
+    :param function include: A method that accepts a file path and file name, and returns whether to test the file
+                             (default true).
+
+    pytest example::
+
+        from jscc.testing.checks import get_empty_files
+        from jscc.testing.util import warn_and_assert
+
+        def test_empty():
+            warn_and_assert(get_empty_files(), '{0} is empty, run: rm {0}',
+                            'Files are empty. See warnings below.')
+
+    """
+    for path, name in walk():
+        if tracked(path) and include(path, name) and name != '__init__.py':
+            try:
+                with open(path) as f:
+                    text = f.read()
+            except UnicodeDecodeError:
+                continue  # the file is non-empty, and might be binary
+
+            if name.endswith('.json'):
+                try:
+                    if not json.loads(text):
+                        yield path,
+                except json.decoder.JSONDecodeError:
+                    continue  # the file is non-empty
+            elif not text.strip():
+                yield path,
+
+
+def get_unindented_files(include=true):
+    """
+    Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
+
+    :param function include: A method that accepts a file path and file name, and returns whether to test the file
+                             (default true).
+
+    pytest example::
+
+        from jscc.testing.checks import get_unindented_files
+        from jscc.testing.util import warn_and_assert
+
+        def test_indent():
+            warn_and_assert(get_unindented_files(), '{0} is not indented as expected, run: ocdskit indent {0}',
+                            'Files are not indented as expected. See warnings below, or run: ocdskit indent -r .')
+    """
+    for path, name, text, data in walk_json_data():
+        if tracked(path) and include(path, name):
+            expected = json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': ')) + '\n'
+            if text != expected:
+                yield path,
+
+
+def get_invalid_json_files():
+    """
+    Yields the path and exception (as a tuple) of any JSON file that isn't valid.
+
+    pytest example::
+
+        from jscc.testing.checks import get_invalid_json_files
+        from jscc.testing.util import warn_and_assert
+
+        def test_indent():
+            warn_and_assert(get_invalid_json_files(), '{0} is not valid JSON: {1}',
+                            'JSON files are invalid. See warnings below.')
+    """
+    for path, name in walk():
+        if path.endswith('.json'):
+            with open(path) as f:
+                text = f.read()
+                if text:
+                    try:
+                        json.loads(text, object_pairs_hook=rejecting_dict)
+                    except (json.decoder.JSONDecodeError, DuplicateKeyError) as e:
+                        yield path, e
+
+
+def get_json_schema_errors(schema, metaschema):
+    """
+    Yields each error in the JSON Schema file.
+
+    :param object schema: the schema to validate
+    :param object metaschema: the metaschema against which to validate
+
+    pytest example::
+
+        import json
+        import requests
+        from jscc.testing.checks import get_json_schema_errors
+
+        def test_schema_valid():
+            metaschema = requests.get('http://json-schema.org/draft-04/schema').json()
+
+            path = 'schema/package.json'
+            with open(path) as f:
+                data = json.load(f)
+
+            errors = list(get_json_schema_errors(data, metaschema))
+
+            for error in errors:
+                warnings.warn(json.dumps(error.instance, indent=2, separators=(',', ': ')))
+                warnings.warn('ERROR: {0} ({1})\\n'.format(error.message, '/'.join(error.absolute_schema_path)))
+
+            assert not errors, '{0} is not valid JSON Schema ({1} errors)'.format(path, len(errors))
+    """
+    for error in validator(metaschema, format_checker=FormatChecker()).iter_errors(schema):
+        yield error
+
+
 def validate_letter_case(*args):
     """
     Prints and returns the number of errors relating to the letter case of properties and definitions.
@@ -543,120 +660,3 @@ def validate_json_schema(path, name, data, schema, full_schema=not is_extension,
         errors += validate_deep_properties(path, data)
 
     assert errors == 0, 'One or more JSON Schema files are invalid. See warnings below.'
-
-
-def get_json_schema_errors(schema, metaschema):
-    """
-    Yields each error in the JSON Schema file.
-
-    :param object schema: the schema to validate
-    :param object metaschema: the metaschema against which to validate
-
-    pytest example::
-
-        import json
-        import requests
-        from jscc.testing.checks import get_json_schema_errors
-
-        def test_schema_valid():
-            metaschema = requests.get('http://json-schema.org/draft-04/schema').json()
-
-            path = 'schema/package.json'
-            with open(path) as f:
-                data = json.load(f)
-
-            errors = list(get_json_schema_errors(data, metaschema))
-
-            for error in errors:
-                warnings.warn(json.dumps(error.instance, indent=2, separators=(',', ': ')))
-                warnings.warn('ERROR: {0} ({1})\\n'.format(error.message, '/'.join(error.absolute_schema_path)))
-
-            assert not errors, '{0} is not valid JSON Schema ({1} errors)'.format(path, len(errors))
-    """
-    for error in validator(metaschema, format_checker=FormatChecker()).iter_errors(schema):
-        yield error
-
-
-def get_invalid_json_files():
-    """
-    Yields the path and exception (as a tuple) of any JSON file that isn't valid.
-
-    pytest example::
-
-        from jscc.testing.checks import get_invalid_json_files
-        from jscc.testing.util import warn_and_assert
-
-        def test_indent():
-            warn_and_assert(get_invalid_json_files(), '{0} is not valid JSON: {1}',
-                            'JSON files are invalid. See warnings below.')
-    """
-    for path, name in walk():
-        if path.endswith('.json'):
-            with open(path) as f:
-                text = f.read()
-                if text:
-                    try:
-                        json.loads(text, object_pairs_hook=rejecting_dict)
-                    except (json.decoder.JSONDecodeError, DuplicateKeyError) as e:
-                        yield path, e
-
-
-def get_unindented_files(include=true):
-    """
-    Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
-
-    :param function include: A method that accepts a file path and file name, and returns whether to test the file
-                             (default true).
-
-    pytest example::
-
-        from jscc.testing.checks import get_unindented_files
-        from jscc.testing.util import warn_and_assert
-
-        def test_indent():
-            warn_and_assert(get_unindented_files(), '{0} is not indented as expected, run: ocdskit indent {0}',
-                            'Files are not indented as expected. See warnings below, or run: ocdskit indent -r .')
-    """
-    for path, name, text, data in walk_json_data():
-        if tracked(path) and include(path, name):
-            expected = json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': ')) + '\n'
-            if text != expected:
-                yield path,
-
-
-def get_empty_files(include=true, parse_as_json=false):
-    """
-    Yields the path (as a tuple) of any file that is empty.
-
-    If the file's contents are parsed as JSON, it is empty if the JSON is falsy. Otherwise, the file is empty if it
-    contains only whitespace.
-
-    :param function include: A method that accepts a file path and file name, and returns whether to test the file
-                             (default true).
-
-    pytest example::
-
-        from jscc.testing.checks import get_empty_files
-        from jscc.testing.util import warn_and_assert
-
-        def test_empty():
-            warn_and_assert(get_empty_files(), '{0} is empty, run: rm {0}',
-                            'Files are empty. See warnings below.')
-
-    """
-    for path, name in walk():
-        if tracked(path) and include(path, name) and name != '__init__.py':
-            try:
-                with open(path) as f:
-                    text = f.read()
-            except UnicodeDecodeError:
-                continue  # the file is non-empty, and might be binary
-
-            if name.endswith('.json'):
-                try:
-                    if not json.loads(text):
-                        yield path,
-                except json.decoder.JSONDecodeError:
-                    continue  # the file is non-empty
-            elif not text.strip():
-                yield path,
