@@ -451,9 +451,9 @@ def validate_object_id(*args, allow_missing=(), allow_optional=()):
     Warns and returns the number of errors relating to objects within arrays lacking "id" fields.
 
     :param allow_missing: JSON Pointers of fields that are allowed to not have an "id" field
-    :type : list, tuple or set
+    :type allow_missing: list, tuple or set
     :param allow_optional: JSON Pointers of fields whose "id" field is allowed to be optional
-    :type : list, tuple or set
+    :type allow_optional: list, tuple or set
     """
     def block(path, data, pointer):
         errors = 0
@@ -528,7 +528,7 @@ def validate_merge_properties(*args, allow_null=()):
 
 def validate_ref(path, data):
     """
-    Warns and returns ``1`` if not all ``$ref``erences can be resolved.
+    Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
     """
     ref = JsonRef.replace_refs(data)
 
