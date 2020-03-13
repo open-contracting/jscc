@@ -8,7 +8,8 @@ def is_codelist(reader):
 
     :param csv.DictReader reader: A CSV reader
     """
-    return 'Code' in reader.fieldnames  # TODO
+    # OCDS uses titlecase. BODS uses lowercase.
+    return 'Code' in reader.fieldnames or 'code' in reader.fieldnames
 
 
 def is_json_schema(data):
