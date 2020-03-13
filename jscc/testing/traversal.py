@@ -19,33 +19,31 @@ def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
             if directory in dirs:
                 dirs.remove(directory)
         for name in files:
-            yield root, name
+            yield os.path.join(root, name), name
 
 
 def walk_json_data(patch=None, **kwargs):
     """
-    Walks a directory tree, and yields tuples consisting of a file path, text content, and JSON data.
+    Walks a directory tree, and yields tuples consisting of a file path, file name, text content, and JSON data.
     """
-    for root, name in walk(**kwargs):
-        if name.endswith('.json'):
-            path = os.path.join(root, name)
+    for path, name in walk(**kwargs):
+        if path.endswith('.json'):
             with open(path) as f:
                 text = f.read()
                 if text:
                     if patch:
                         text = patch(text)
                     try:
-                        yield path, text, json.loads(text)
+                        yield path, name, text, json.loads(text)
                     except json.decoder.JSONDecodeError:
                         continue
 
 
 def walk_csv_data(**kwargs):
     """
-    Walks a directory tree, and yields tuples consisting of a file path and CSV reader.
+    Walks a directory tree, and yields tuples consisting of a file path, file name, and CSV reader.
     """
-    for root, name in walk(**kwargs):
-        if name.endswith('.csv'):
-            path = os.path.join(root, name)
+    for path, name in walk(**kwargs):
+        if path.endswith('.csv'):
             with open(path, newline='') as f:
-                yield path, csv.DictReader(f)
+                yield path, name, csv.DictReader(f)

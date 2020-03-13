@@ -8,7 +8,7 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.schema import get_types, is_array_of_objects, is_json_schema, traverse
+from jscc.testing.schema import get_types, is_array_of_objects, traverse
 from jscc.testing.traversal import walk, walk_csv_data, walk_json_data
 from jscc.testing.util import difference, false, is_codelist, rejecting_dict, tracked, true
 
@@ -208,9 +208,9 @@ def validate_codelist_enum(*args):  # OCDS-only
                     actual = set(data['items']['enum'])
 
                 # It'd be faster to cache the CSVs, but most extensions have only one closed codelist.
-                for csvpath, reader in walk_csv_data():
+                for csvpath, csvname, reader in walk_csv_data():
                     # The codelist's CSV file should exist.
-                    if os.path.basename(csvpath) == data['codelist']:
+                    if csvname == data['codelist']:
                         # The codelist's CSV file should match the `enum` values, if the field is set.
                         if actual:
                             expected = set([row['Code'] for row in reader])
@@ -441,20 +441,19 @@ def validate_codelist_files_used_in_schema(path, data, top, is_extension):  # OC
     # Extensions aren't expected to repeat referenced codelist CSV files.
     # TODO: This code assumes each schema uses all codelists. So, for now, skip package schema.
     codelist_files = set()
-    for csvpath, reader in walk_csv_data(top):
+    for csvpath, csvname, reader in walk_csv_data(top=top):
         parts = csvpath.replace(top, '').split(os.sep)  # maybe inelegant way to isolate consolidated extension
         if is_codelist(reader) and (
                 # Take all codelists in extensions.
                 (is_extension and not is_profile) or
                 # Take non-extension codelists in core, and non-core codelists in profiles.
                 not any(c in parts for c in ('extensions', 'patched'))):
-            name = os.path.basename(csvpath)
-            if name.startswith(('+', '-')):
-                if name[1:] not in external_codelists:
+            if csvname.startswith(('+', '-')):
+                if csvname[1:] not in external_codelists:
                     errors += 1
-                    warnings.warn('ERROR: {} {} modifies non-existent codelist'.format(path, name))
+                    warnings.warn('ERROR: {} {} modifies non-existent codelist'.format(path, csvname))
             else:
-                codelist_files.add(name)
+                codelist_files.add(csvname)
 
     codelist_values = collect_codelist_values(path, data)
     if is_extension:
@@ -475,7 +474,7 @@ def validate_codelist_files_used_in_schema(path, data, top, is_extension):  # OC
     return errors
 
 
-def validate_json_schema(path, data, schema, full_schema=not is_extension, top=cwd):
+def validate_json_schema(path, name, data, schema, full_schema=not is_extension, top=cwd):
     """
     Prints and asserts errors in a JSON Schema.
     """
@@ -503,15 +502,7 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
     exceptions = json_schema_exceptions | ocds_schema_exceptions
     allow_null = repo_name != 'infrastructure'
 
-    for error in validator(schema, format_checker=FormatChecker()).iter_errors(data):
-        errors += 1
-        warnings.warn(json.dumps(error.instance, indent=2, separators=(',', ': ')))
-        warnings.warn('ERROR: {} ({})\n'.format(error.message, '/'.join(error.absolute_schema_path)))
-
-    if errors:
-        warnings.warn('ERROR: {} is not valid JSON Schema ({} errors)'.format(path, errors))
-
-    if os.path.basename(path) not in exceptions:
+    if name not in exceptions:
         kwargs = {}
         if 'versioned-release-validation-schema.json' in path:
             kwargs['additional_valid_types'] = ['object']
@@ -536,13 +527,13 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
         # Extensions aren't expected to repeat referenced `definitions`.
         errors += validate_ref(path, data)
 
-        if os.path.basename(path) not in exceptions_plus_versioned:
+        if name not in exceptions_plus_versioned:
             # Extensions aren't expected to repeat `title`, `description`, `type`.
             errors += validate_title_description_type(path, data)
             # Extensions aren't expected to repeat referenced `definitions`.
             errors += validate_object_id(path, JsonRef.replace_refs(data))
 
-        if os.path.basename(path) not in exceptions_plus_versioned_and_packages:
+        if name not in exceptions_plus_versioned_and_packages:
             # Extensions aren't expected to repeat `required`. Packages don't have merge rules.
             errors += validate_null_type(path, data, allow_null=allow_null)
 
@@ -554,13 +545,23 @@ def validate_json_schema(path, data, schema, full_schema=not is_extension, top=c
     assert errors == 0, 'One or more JSON Schema files are invalid. See warnings below.'
 
 
+def get_json_schema_errors(schema, metaschema):
+    """
+    Yields each error in the JSON Schema file.
+
+    :param object schema: the schema to validate
+    :param object metaschema: the metaschema against which to validate
+    """
+    for error in validator(metaschema, format_checker=FormatChecker()).iter_errors(schema):
+        yield error
+
+
 def get_invalid_files():
     """
     Yields the path and exception of any JSON file that isn't valid.
     """
-    for root, name in walk():
-        if name.endswith('.json'):
-            path = os.path.join(root, name)
+    for path, name in walk():
+        if path.endswith('.json'):
             with open(path) as f:
                 text = f.read()
                 if text:
@@ -570,13 +571,13 @@ def get_invalid_files():
                         yield path, e
 
 
-def get_unindented_files(include=true, patch=None):
+def get_unindented_files(include=true):
     """
     Yields the path of any JSON file that isn't formatted for humans.
-    """
-    for path, text, data in walk_json_data(patch):
-        name = os.path.basename(path)
 
+    :param function include: A method that returns whether to test the file (default true).
+    """
+    for path, name, text, data in walk_json_data():
         if tracked(path) and include(path, name):
             expected = json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': ')) + '\n'
             if text != expected:
@@ -593,9 +594,7 @@ def get_empty_files(include=true, parse_as_json=false):
     :param function include: A method that returns whether to test the file (default true).
     :param function parse_as_json: A method that returns whether to parse the file's contents as JSON (default false).
     """
-    for root, name in walk():
-        path = os.path.join(root, name)
-
+    for path, name in walk():
         if tracked(path) and include(path, name) and name != '__init__.py':
             try:
                 with open(path) as f:
