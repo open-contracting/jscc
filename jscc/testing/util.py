@@ -91,6 +91,8 @@ def warn_and_assert(paths, warn_message, assert_message):
     """
     success = True
     for args in paths:
+        if isinstance(args, str):
+            args = [args]
         warnings.warn('ERROR: ' + warn_message.format(*args))
         success = False
 
