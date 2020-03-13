@@ -10,7 +10,6 @@ from jsonschema.validators import Draft4Validator as validator
 from jscc.exceptions import DuplicateKeyError
 from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, rejecting_dict
 from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
-from jscc.testing.util import difference, false, true
 
 # The codelists defined in `standard/schema/codelists`. XXX Hardcoding.
 external_codelists = {
@@ -25,7 +24,7 @@ is_profile = os.path.isfile(os.path.join(cwd, 'Makefile')) and repo_name not in 
 is_extension = os.path.isfile(os.path.join(cwd, 'extension.json')) or is_profile
 
 
-def get_empty_files(include=true, parse_as_json=false):
+def get_empty_files(include=_true):
     """
     Yields the path (as a tuple) of any file that is empty.
 
@@ -63,7 +62,7 @@ def get_empty_files(include=true, parse_as_json=false):
                 yield path,
 
 
-def get_unindented_files(include=true):
+def get_unindented_files(include=_true):
     """
     Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
 
@@ -337,7 +336,7 @@ def validate_codelist_enum(*args):  # OCDS-only
                                 expected.add(None)
 
                             if actual != expected:
-                                added, removed = difference(actual, expected)
+                                added, removed = _difference(actual, expected)
 
                                 errors += 1
                                 warnings.warn('ERROR: {} has mismatch between `enum` and codelist at {}{}{}'.format(
@@ -681,3 +680,36 @@ def _traverse(block):
         return errors
 
     return method
+
+
+def _difference(actual, expected):
+    """
+    Returns strings describing the differences between actual and expected values.
+    """
+    added = actual - expected
+    if added:
+        added = '; added {}'.format(added)
+    else:
+        added = ''
+
+    removed = expected - actual
+    if removed:
+        removed = '; removed {}'.format(removed)
+    else:
+        removed = ''
+
+    return added, removed
+
+
+def _true():
+    """
+    Returns ``True`` (used internally as a default method).
+    """
+    return True
+
+
+def _false():
+    """
+    Returns ``False`` (used internally as a default method).
+    """
+    return False

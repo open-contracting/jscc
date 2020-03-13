@@ -27,25 +27,6 @@ def http_head(url):
     return requests.head(url)
 
 
-def difference(actual, expected):
-    """
-    Returns strings describing the differences between actual and expected values.
-    """
-    added = actual - expected
-    if added:
-        added = '; added {}'.format(added)
-    else:
-        added = ''
-
-    removed = expected - actual
-    if removed:
-        removed = '; removed {}'.format(removed)
-    else:
-        removed = ''
-
-    return added, removed
-
-
 def warn_and_assert(paths, warn_message, assert_message):
     """
     If ``paths`` isn't empty, issues a warning for each path, and raises an assertion error.
@@ -60,17 +41,3 @@ def warn_and_assert(paths, warn_message, assert_message):
         success = False
 
     assert success, assert_message
-
-
-def true():
-    """
-    Returns ``True`` (used internally as a default method).
-    """
-    return True
-
-
-def false():
-    """
-    Returns ``False`` (used internally as a default method).
-    """
-    return False
