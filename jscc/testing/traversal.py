@@ -25,6 +25,10 @@ def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
 def walk_json_data(patch=None, **kwargs):
     """
     Walks a directory tree, and yields tuples consisting of a file path, file name, text content, and JSON data.
+
+    Accepts the same keyword arguments as :meth:`jscc.testing.traversal.walk`.
+
+    :param function patch: a method that accepts text, and returns modified text.
     """
     for path, name in walk(**kwargs):
         if path.endswith('.json'):
@@ -42,6 +46,8 @@ def walk_json_data(patch=None, **kwargs):
 def walk_csv_data(**kwargs):
     """
     Walks a directory tree, and yields tuples consisting of a file path, file name, and CSV reader.
+
+    Accepts the same keyword arguments as :meth:`jscc.testing.traversal.walk`.
     """
     for path, name in walk(**kwargs):
         if path.endswith('.csv'):

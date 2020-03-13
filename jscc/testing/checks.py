@@ -569,7 +569,7 @@ def get_json_schema_errors(schema, metaschema):
 
             for error in errors:
                 warnings.warn(json.dumps(error.instance, indent=2, separators=(',', ': ')))
-                warnings.warn('ERROR: {0} ({1})\n'.format(error.message, '/'.join(error.absolute_schema_path)))
+                warnings.warn('ERROR: {0} ({1})\\n'.format(error.message, '/'.join(error.absolute_schema_path)))
 
             assert not errors, '{0} is not valid JSON Schema ({1} errors)'.format(path, len(errors))
     """

@@ -17,11 +17,21 @@ untracked = {
 
 @lru_cache()
 def http_get(url):
+    """
+    Sends and caches an HTTP GET request.
+
+    :param str url: the URL to request
+    """
     return requests.get(url)
 
 
 @lru_cache()
 def http_head(url):
+    """
+    Sends and caches an HTTP HEAD request.
+
+    :param str url: the URL to request
+    """
     return requests.head(url)
 
 
@@ -45,7 +55,7 @@ def is_codelist(reader):
 
 class RejectingDict(UserDict):
     """
-    Raises an error if a key is set more than once.
+    A ``dict`` that raises an error if a key is set more than once.
     """
     # See https://tools.ietf.org/html/rfc7493#section-2.3
     def __setitem__(self, k, v):
@@ -99,13 +109,13 @@ def warn_and_assert(paths, warn_message, assert_message):
 
 def true():
     """
-    Returns ``True``.
+    Returns ``True`` (used internally as a default method).
     """
     return True
 
 
 def false():
     """
-    Returns ``False``.
+    Returns ``False`` (used internally as a default method).
     """
     return False

@@ -9,7 +9,9 @@ def is_json_schema(data):
 
 def is_json_merge_patch(data):
     """
-    Returns whether the data is a JSON Merge Patch.
+    Returns whether the JSON data is a JSON Merge Patch.
+
+    :param data: JSON data
     """
     return '$schema' not in data and ('definitions' in data or 'properties' in data)
 
@@ -25,7 +27,7 @@ def is_array_of_objects(field):
 
 def get_types(field):
     """
-    Returns a field's `type` as a list.
+    Returns a field's ``type`` as a list.
 
     :param dict field: the field
     """
@@ -38,7 +40,7 @@ def get_types(field):
 
 def traverse(block):
     """
-    Implements common logic used by `validate_*` methods.
+    Implements common logic used by ``validate_*`` methods.
     """
     def method(path, data, pointer=''):
         errors = 0
