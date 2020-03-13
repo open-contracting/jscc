@@ -1,3 +1,7 @@
+"""
+Methods that directly support the validation of JSON Schema and CSV codelists.
+"""
+
 import json
 import os
 import re

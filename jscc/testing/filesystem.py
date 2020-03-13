@@ -1,3 +1,7 @@
+"""
+Methods for interacting with or reasoning about the filesystem.
+"""
+
 import csv
 import json
 import os

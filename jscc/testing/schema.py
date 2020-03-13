@@ -1,3 +1,7 @@
+"""
+Methods for reading JSON Schema and CSV codelists.
+"""
+
 def is_codelist(reader):
     """
     Returns whether the CSV is a codelist.

@@ -1,3 +1,7 @@
+"""
+Miscellaneous methods, mainly used by other repositories.
+"""
+
 import warnings
 from collections import UserDict
 from functools import lru_cache
