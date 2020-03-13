@@ -3,12 +3,9 @@ Miscellaneous methods, mainly used by other repositories.
 """
 
 import warnings
-from collections import UserDict
 from functools import lru_cache
 
 import requests
-
-from jscc.exceptions import DuplicateKeyError
 
 
 @lru_cache()
@@ -18,7 +15,9 @@ def http_get(url):
 
     :param str url: the URL to request
     """
-    return requests.get(url)
+    response = requests.get(url)
+    response.raise_for_status()
+    return response
 
 
 @lru_cache()
@@ -28,7 +27,28 @@ def http_head(url):
 
     :param str url: the URL to request
     """
-    return requests.head(url)
+    response = requests.head(url)
+    response.raise_for_status()
+    return response
+
+
+def difference(actual, expected):
+    """
+    Returns strings describing the differences between actual and expected values.
+    """
+    added = actual - expected
+    if added:
+        added = '; added {}'.format(added)
+    else:
+        added = ''
+
+    removed = expected - actual
+    if removed:
+        removed = '; removed {}'.format(removed)
+    else:
+        removed = ''
+
+    return added, removed
 
 
 def warn_and_assert(paths, warn_message, assert_message):

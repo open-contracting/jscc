@@ -1,6 +1,10 @@
 """
 Methods for reading JSON Schema and CSV codelists.
 """
+from collections import UserDict
+
+from jscc.exceptions import DuplicateKeyError
+
 
 def is_codelist(reader):
     """
@@ -16,7 +20,7 @@ def is_json_schema(data):
     """
     Returns whether the JSON data is a JSON Schema.
 
-    :param data: JSON data
+    :param dict data: JSON data
     """
     return '$schema' in data or 'definitions' in data or 'properties' in data
 
@@ -25,7 +29,7 @@ def is_json_merge_patch(data):
     """
     Returns whether the JSON data is a JSON Merge Patch.
 
-    :param data: JSON data
+    :param dict data: JSON data
     """
     return '$schema' not in data and ('definitions' in data or 'properties' in data)
 
@@ -37,6 +41,16 @@ def is_array_of_objects(field):
     :param dict field: the field
     """
     return 'array' in field.get('type', []) and any(key in field.get('items', {}) for key in ('$ref', 'properties'))
+
+
+def is_property_missing(field, prop):
+    """
+    Returns whether a field's property isn't set, is falsy or is whitespace.
+
+    :param dict field: the field
+    :param str prop: the property
+    """
+    return prop not in field or not field[prop] or not field[prop].strip()
 
 
 def get_types(field):
