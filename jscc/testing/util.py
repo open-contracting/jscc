@@ -34,7 +34,18 @@ def http_head(url):
 
 def difference(actual, expected):
     """
-    Returns strings describing the differences between actual and expected values.
+    Returns strings describing the differences between actual and expected sets.
+
+    Example::
+
+        >>> difference({1, 2, 3}, {3, 4, 5})
+        ('; added {1, 2}', '; removed {4, 5}')
+
+        >>> difference({1}, {1})
+        ('', '')
+
+    :param set actual: the actual set
+    :param set expected: the expected set
     """
     added = actual - expected
     if added:
