@@ -59,14 +59,14 @@ from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, is_
 from jscc.testing.util import difference
 
 
-def _true():
+def _true(*args):
     """
     Returns ``True`` (used internally as a default method).
     """
     return True
 
 
-def _false():
+def _false(*args):
     """
     Returns ``False`` (used internally as a default method).
     """
@@ -77,8 +77,7 @@ def get_empty_files(include=_true):
     """
     Yields the path (as a tuple) of any file that is empty.
 
-    If the file's contents are parsed as JSON, it is empty if the JSON is falsy. Otherwise, the file is empty if it
-    contains only whitespace.
+    JSON files are empty if their JSON data are empty. Other files are empty if they contain only whitespace.
 
     :param function include: a method that accepts a file path and file name, and returns whether to test the file
                              (default true)
@@ -103,7 +102,8 @@ def get_empty_files(include=_true):
 
             if name.endswith('.json'):
                 try:
-                    if not json.loads(text):
+                    value = json.loads(text)
+                    if not value and not isinstance(value, (bool, int, float)):
                         yield path,
                 except json.decoder.JSONDecodeError:
                     continue  # the file is non-empty
@@ -129,7 +129,7 @@ def get_misindented_files(include=_true):
     """
     for path, name, text, data in walk_json_data():
         if tracked(path) and include(path, name):
-            expected = json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': ')) + '\n'
+            expected = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
             if text != expected:
                 yield path,
 
