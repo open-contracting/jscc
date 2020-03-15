@@ -10,6 +10,6 @@ install:
   - pip install .[test]
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
-  - pytest --cov jscc
+  - pytest --cov jscc --vcr-record=none
 after_success:
   coveralls

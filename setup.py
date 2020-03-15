@@ -26,6 +26,7 @@ setup(
             'coveralls',
             'pytest',
             'pytest-cov',
+            'pytest-vcr',
         ],
         'docs': [
             'Sphinx',
