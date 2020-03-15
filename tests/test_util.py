@@ -14,7 +14,7 @@ def test_http_head(meth):
 
 
 @pytest.mark.vcr()
-def test_http_head():
+def test_http_head_error():
     with pytest.raises(requests.exceptions.HTTPError):
         http_head('http://httpbin.org/status/400')
 
@@ -27,7 +27,7 @@ def test_http_get(meth):
 
 
 @pytest.mark.vcr()
-def test_http_get():
+def test_http_get_error():
     with pytest.raises(requests.exceptions.HTTPError):
         http_get('http://httpbin.org/status/400')
 
