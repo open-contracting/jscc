@@ -1,5 +1,5 @@
 """
-Methods for reading JSON Schema and CSV codelists.
+Methods for reasoning about JSON Schema and CSV codelists.
 """
 from collections import UserDict
 
@@ -43,7 +43,7 @@ def is_array_of_objects(field):
     return 'array' in field.get('type', []) and any(key in field.get('items', {}) for key in ('$ref', 'properties'))
 
 
-def is_property_missing(field, prop):
+def is_missing_property(field, prop):
     """
     Returns whether a field's property isn't set, is empty, or is whitespace.
 

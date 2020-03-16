@@ -8,7 +8,7 @@ The typical usage is to first define a test method like so:
 .. code-block:: python
 
    from jscc.testing.filesystem import walk_json_data
-   from jscc.testing.schema import is_json_schema
+   from jscc.schema import is_json_schema
    from jscc.testing.util import http_get
 
    schemas = [(path, name, data) for path, name, _, data in walk_json_data() if is_json_schema(data)]
@@ -23,9 +23,9 @@ You can edit ``metaschema`` to be more strict and/or to add new properties. Then
 .. code-block:: python
 
    from jsonref import JsonRef
-   from jscc.testing.schema import (validate_codelist_enum, validate_deep_properties, validate_items_type,
-                                    validate_letter_case, validate_merge_properties, validate_metadata_presence,
-                                    validate_null_type, validate_object_id, validate_ref, validate_schema)
+   from jscc.schema import (validate_codelist_enum, validate_deep_properties, validate_items_type,
+                            validate_letter_case, validate_merge_properties, validate_metadata_presence,
+                            validate_null_type, validate_object_id, validate_ref, validate_schema)
 
    def validate_json_schema(path, name, data, schema):
        errors = 0
@@ -77,7 +77,7 @@ from jscc.exceptions import (CodelistEnumWarning, DeepPropertiesWarning, Duplica
                              LetterCaseWarning, MergePropertiesWarning, MetadataPresenceWarning, NullTypeWarning,
                              ObjectIdWarning, RefWarning, SchemaCodelistsMatchWarning, SchemaWarning)
 from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
-from jscc.testing.schema import get_types, is_array_of_objects, is_codelist, is_property_missing, rejecting_dict
+from jscc.schema import get_types, is_array_of_objects, is_codelist, is_missing_property, rejecting_dict
 from jscc.testing.util import difference
 
 
@@ -256,7 +256,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
         if parent not in schema_fields and grandparent not in schema_sections or grandparent == 'properties':
             for prop in required_properties:
                 # If a field has `$ref`, then its `title` and `description` might defer to the reference.
-                if is_property_missing(data, prop) and '$ref' not in data and not allow_missing(pointer):
+                if is_missing_property(data, prop) and '$ref' not in data and not allow_missing(pointer):
                     errors += 1
                     warn('{} is missing {}/{}'.format(path, pointer, prop), MetadataPresenceWarning)
 

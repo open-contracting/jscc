@@ -4,8 +4,8 @@ import json
 import pytest
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.schema import (get_types, is_array_of_objects, is_codelist, is_json_merge_patch, is_json_schema,
-                                 is_property_missing, rejecting_dict)
+from jscc.schema import (get_types, is_array_of_objects, is_codelist, is_json_merge_patch, is_json_schema,
+                         is_property_missing, rejecting_dict)
 from tests import parse, path
 
 
@@ -55,8 +55,8 @@ def test_is_array_of_objects(field, expected):
     ('maximum', False),
     ('additionalItems', False),
 ])
-def test_is_property_missing(prop, expected):
-    assert is_property_missing(parse('schema.json')['properties']['metadata'], prop) == expected
+def test_is_missing_property(prop, expected):
+    assert is_missing_property(parse('schema.json')['properties']['metadata'], prop) == expected
 
 
 @pytest.mark.parametrize('field,expected', [
