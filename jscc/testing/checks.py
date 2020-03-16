@@ -192,11 +192,8 @@ def validate_schema(path, data, schema):
 
     for error in validator(schema, format_checker=FormatChecker()).iter_errors(data):
         errors += 1
-        warn(json.dumps(error.instance, indent=2, separators=(',', ': ')))
-        warn('{0} ({1})\n'.format(error.message, '/'.join(error.absolute_schema_path)))
-
-    if errors:
-        warn('{0} is not valid JSON Schema ({1} errors)'.format(path, errors), SchemaWarning)
+        warn('{}\n{} ({})\n'.format(json.dumps(error.instance, indent=2), error.message,
+                                    '/'.join(error.absolute_schema_path)), SchemaWarning)
 
     return errors
 

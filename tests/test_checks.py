@@ -227,12 +227,9 @@ def test_validate_schema():
     with pytest.warns(UserWarning) as records:
         errors = validate('schema', parse('meta-schema.json'))
 
-    assert errors == 1
-    assert len(records) == 3
+    assert errors == len(records) == 1
     assert [str(record.message) for record in records] == [
-        '[]',
-        "[] is not of type 'object' (properties/properties/type)\n",
-        'tests/fixtures/schema/schema.json is not valid JSON Schema (1 errors)',
+        "[]\n[] is not of type 'object' (properties/properties/type)\n",
     ]
 
 
