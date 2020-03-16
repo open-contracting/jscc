@@ -17,7 +17,7 @@ def test_is_codelist(filename, expected):
     with open(path(filename)) as f:
         reader = csv.DictReader(f)
 
-        assert is_codelist(reader) == expected
+        assert is_codelist(reader.fieldnames) == expected
 
 
 @pytest.mark.parametrize('filename,expected', [

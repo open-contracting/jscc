@@ -10,14 +10,14 @@ from jscc.exceptions import DuplicateKeyError
 from jscc.testing.util import http_get
 
 
-def is_codelist(reader):
+def is_codelist(fieldnames):
     """
-    :param csv.DictReader reader: A CSV reader
+    :param list fieldnames: the fieldnames of the CSV
     :returns: whether the CSV is a codelist
     :rtype: bool
     """
     # OCDS uses titlecase. BODS uses lowercase.
-    return 'Code' in reader.fieldnames or 'code' in reader.fieldnames
+    return 'Code' in fieldnames or 'code' in fieldnames
 
 
 def is_json_schema(data):

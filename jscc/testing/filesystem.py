@@ -2,9 +2,11 @@
 Methods for interacting with or reasoning about the filesystem.
 """
 
+import _csv
 import csv
 import json
 import os
+from io import StringIO
 
 untracked = {
     '.egg-info/',
@@ -57,14 +59,21 @@ def walk_json_data(patch=None, **kwargs):
 
 def walk_csv_data(**kwargs):
     """
-    Walks a directory tree, and yields tuples consisting of a file path, file name, and CSV reader.
+    Walks a directory tree, and yields tuples consisting of a file path, file name, text content, fieldnames, and rows.
 
     Accepts the same keyword arguments as :meth:`jscc.testing.filesystem.walk`.
     """
     for path, name in walk(**kwargs):
         if path.endswith('.csv'):
             with open(path, newline='') as f:
-                yield path, name, csv.DictReader(f)
+                text = f.read()
+                reader = csv.DictReader(StringIO(text))
+                try:
+                    fieldnames = reader.fieldnames
+                    rows = [row for row in reader]
+                    yield (path, name, text, fieldnames, rows)
+                except _csv.Error as e:
+                    assert False, '{} is not valid CSV ({})'.format(path, e)
 
 
 def tracked(path):

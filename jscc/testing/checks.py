@@ -385,12 +385,12 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                     actual = set(data['items']['enum'])
 
                 # It'd be faster to cache the CSVs, but most extensions have only one closed codelist.
-                for csvpath, csvname, reader in walk_csv_data():
+                for _, csvname, _, _, rows in walk_csv_data():
                     # The codelist's CSV file should exist.
                     if csvname == data['codelist']:
                         # The codelist's CSV file should match the `enum` values, if the field is set.
                         if actual:
-                            expected = set([row['Code'] for row in reader])
+                            expected = set([row['Code'] for row in rows])
 
                             # Add None if the field is nullable.
                             if 'string' in types and 'null' in types:
@@ -621,10 +621,10 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
     errors = 0
 
     codelist_files = set()
-    for csvpath, csvname, reader in walk_csv_data(top=top):
+    for csvpath, csvname, _, fieldnames, _ in walk_csv_data(top=top):
         parts = csvpath.replace(top, '').split(os.sep)  # maybe inelegant way to isolate consolidated extension
         # Take all codelists in extensions, all codelists in core, and non-core codelists in profiles.
-        if is_codelist(reader) and ((is_extension and not is_profile) or 'patched' not in parts):
+        if is_codelist(fieldnames) and ((is_extension and not is_profile) or 'patched' not in parts):
             if csvname.startswith(('+', '-')):
                 if csvname[1:] not in external_codelists:
                     errors += 1
