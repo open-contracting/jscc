@@ -1,0 +1,84 @@
+{
+  "properties": {
+    "passString": {
+      "codelist": "test.csv",
+      "openCodelist": false,
+      "type": "string",
+      "enum": [
+        "code"
+      ]
+    },
+    "passArray": {
+      "codelist": "test.csv",
+      "openCodelist": false,
+      "type": "array",
+      "items": {
+        "enum": [
+          "code"
+        ]
+      }
+    },
+    "failOpenString": {
+      "codelist": "failOpenString.csv",
+      "openCodelist": true,
+      "type": "string",
+      "enum": []
+    },
+    "failOpenArray": {
+      "codelist": "failOpenArray.csv",
+      "openCodelist": true,
+      "type": "array",
+      "items": {
+        "enum": []
+      }
+    },
+    "failClosedString": {
+      "codelist": "failClosedString.csv",
+      "openCodelist": false,
+      "type": "string"
+    },
+    "failClosedArray": {
+      "codelist": "failClosedArray.csv",
+      "openCodelist": false,
+      "type": "array",
+      "items": {}
+    },
+    "mismatchString": {
+      "codelist": "test.csv",
+      "openCodelist": false,
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "code",
+        "extra"
+      ]
+    },
+    "mismatchArray": {
+      "codelist": "test.csv",
+      "openCodelist": false,
+      "type": "array",
+      "items": {
+        "enum": [
+          "code",
+          "extra"
+        ]
+      }
+    },
+    "missing": {
+      "codelist": "missing.csv",
+      "openCodelist": false,
+      "type": "string",
+      "enum": []
+    },
+    "noCodelistString": {
+      "enum": []
+    },
+    "noCodelistArray": {
+      "items": {
+        "enum": []
+      }
+    }
+  }
+}

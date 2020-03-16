@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "parent": {
+      "properties": {
+        "fail": {}
+      }
+    },
+    "allow": {
+      "properties": {
+        "pass": {}
+      }
+    }
+  }
+}

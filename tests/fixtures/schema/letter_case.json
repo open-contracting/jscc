@@ -1,0 +1,16 @@
+{
+  "properties": {
+    "pass": {},
+    "passPhrase": {},
+    "Fail": {},
+    "fail_phrase": {},
+    "Allow": {}
+  },
+  "definitions": {
+    "Pass": {},
+    "PassPhrase": {},
+    "fail": {},
+    "Fail_Phrase": {},
+    "allow": {}
+  }
+}

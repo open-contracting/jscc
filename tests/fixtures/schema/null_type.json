@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "passRequired": {
+      "type": "string"
+    },
+    "passOptional": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "failRequired": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "failOptional": {
+      "type": "string"
+    },
+    "object": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "required",
+    "failRequired"
+  ]
+}

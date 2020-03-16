@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "pass": {
+      "items": {
+        "type": "string"
+      }
+    },
+    "fail": {
+      "items": {
+        "type": "object"
+      }
+    },
+    "allow": {
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

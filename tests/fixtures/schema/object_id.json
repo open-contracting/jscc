@@ -1,0 +1,85 @@
+{
+  "properties": {
+    "pass": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "id": {}
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "x": {}
+        }
+      }
+    },
+    "optional": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "id": {}
+        }
+      }
+    },
+    "allowMissing": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "x": {}
+        }
+      }
+    },
+    "allowOptional": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "id": {}
+        }
+      }
+    }
+  },
+  "refPass": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/Pass"
+    }
+  },
+  "refMissing": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/Missing"
+    }
+  },
+  "refOptional": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/Optional"
+    }
+  },
+  "definitions": {
+    "Pass": {
+      "properties": {
+        "id": {}
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Missing": {
+      "properties": {
+        "x": {}
+      }
+    },
+    "Optional": {
+      "properties": {
+        "id": {}
+      }
+    }
+  }
+}

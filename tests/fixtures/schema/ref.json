@@ -1,0 +1,13 @@
+{
+  "properties": {
+    "pass": {
+      "$ref": "#/definitions/Pass"
+    },
+    "fail": {
+      "$ref": "#/definitions/Fail"
+    }
+  },
+  "definitions": {
+    "Pass": {}
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Example",
+  "description": "An example",
+  "type": "object",
+  "properties": {
+    "pass": {
+      "$ref": "#/definitions/Pass"
+    },
+    "fail": {
+      "default": 0
+    },
+    "allow": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Pass": {
+      "title": "Field",
+      "description": "A field",
+      "type": "string"
+    }
+  }
+}
