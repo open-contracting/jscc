@@ -8,9 +8,9 @@ from jscc.exceptions import DuplicateKeyError
 
 def is_codelist(reader):
     """
-    Returns whether the CSV is a codelist.
-
     :param csv.DictReader reader: A CSV reader
+    :returns: whether the CSV is a codelist
+    :rtype: bool
     """
     # OCDS uses titlecase. BODS uses lowercase.
     return 'Code' in reader.fieldnames or 'code' in reader.fieldnames
@@ -18,37 +18,37 @@ def is_codelist(reader):
 
 def is_json_schema(data):
     """
-    Returns whether the JSON data is a JSON Schema.
-
     :param dict data: JSON data
+    :returns: whether the JSON data is a JSON Schema
+    :rtype: bool
     """
     return '$schema' in data or 'definitions' in data or 'properties' in data
 
 
 def is_json_merge_patch(data):
     """
-    Returns whether the JSON data is a JSON Merge Patch.
-
     :param dict data: JSON data
+    :returns: whether the JSON data is a JSON Merge Patch
+    :rtype: bool
     """
     return '$schema' not in data and ('definitions' in data or 'properties' in data)
 
 
 def is_array_of_objects(field):
     """
-    Returns whether a field is an array of objects.
-
     :param dict field: the field
+    :returns: whether a field is an array of objects
+    :rtype: bool
     """
     return 'array' in field.get('type', []) and any(key in field.get('items', {}) for key in ('$ref', 'properties'))
 
 
 def is_missing_property(field, prop):
     """
-    Returns whether a field's property isn't set, is empty, or is whitespace.
-
     :param dict field: the field
     :param str prop: the property
+    :returns: whether a field's property isn't set, is empty, or is whitespace
+    :rtype: bool
     """
     return prop not in field or not field[prop] and not isinstance(field[prop], (bool, int, float)) or \
         isinstance(field[prop], str) and not field[prop].strip()
@@ -56,9 +56,11 @@ def is_missing_property(field, prop):
 
 def get_types(field):
     """
-    Returns a field's ``type`` as a list.
+    Returns a field's "type" as a list.
 
     :param dict field: the field
+    :returns: a field's "type"
+    :rtype: list
     """
     if 'type' not in field:
         return []

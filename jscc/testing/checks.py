@@ -185,6 +185,8 @@ def validate_schema(path, data, schema):
     Warns and returns the number of errors relating to JSON Schema validation.
 
     :param object schema: the metaschema against which to validate
+    :returns: the number of errors
+    :rtype: int
     """
     errors = 0
 
@@ -207,6 +209,8 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
     :type property_exceptions: list, tuple or set
     :param definition_exceptions: definition names to ignore
     :type definition_exceptions: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     def block(path, data, pointer):
         errors = 0
@@ -237,6 +241,8 @@ def validate_metadata_presence(*args, allow_missing=_false):
 
     :param function allow_missing: a method that accepts a JSON Pointer, and returns whether the field is allowed to
                                    not have a "title" or "description" property
+    :returns: the number of errors
+    :rtype: int
     """
     schema_fields = {'definitions', 'deprecated', 'items', 'patternProperties', 'properties'}
     schema_sections = {'patternProperties'}
@@ -282,6 +288,8 @@ def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable
     :type allow_no_null: list, tuple or set
     :param allow_null: JSON Pointers of fields whose "type" properties are allowed to include "null"
     :type allow_null: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     errors = 0
 
@@ -345,6 +353,8 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                                 the "enum" property without setting the "codelist" property
     :param function allow_missing: a method that accepts a codelist name, and returns whether the codelist file
                                    is allowed to be missing from the repository
+    :returns: the number of errors
+    :rtype: int
     """
     if not fallback:
         fallback = {}
@@ -422,6 +432,8 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
     :type additional_valid_types: list, tuple or set
     :param allow_invalid: JSON Pointers of fields whose "type" properties are allowed to include invalid values
     :type allow_invalid: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     valid_types = {
         'array',
@@ -453,6 +465,8 @@ def validate_deep_properties(*args, allow_deep=()):
 
     :param allow_deep: JSON Pointers of fields to ignore
     :type allow_deep: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     def block(path, data, pointer):
         errors = 0
@@ -480,6 +494,8 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
                                    not have an "id" field
     :param allow_optional: JSON Pointers of fields whose "id" field is allowed to be optional
     :type allow_optional: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     def block(path, data, pointer):
         errors = 0
@@ -522,6 +538,8 @@ def validate_merge_properties(*args, allow_null=()):
     :param allow_null: JSON Pointers of fields whose "type" properties are allowed to include "null", even if they are
                        arrays of objects that are expected to set "wholeListMerge" properties
     :type allow_null: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     def block(path, data, pointer):
         errors = 0
@@ -553,6 +571,9 @@ def validate_merge_properties(*args, allow_null=()):
 def validate_ref(path, data):
     """
     Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
+
+    :returns: ``1``
+    :rtype: int
     """
     ref = JsonRef.replace_refs(data)
 
@@ -576,6 +597,8 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
     :param bool is_profile: whether the repository is a profile (a collection of extensions)
     :param external_codelists: names of codelists defined by the standard
     :type external_codelists: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
     """
     if not external_codelists:
         external_codelists = set()
