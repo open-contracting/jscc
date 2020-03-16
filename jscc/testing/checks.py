@@ -11,7 +11,7 @@ The typical usage is to first define a test method like so:
    from jscc.testing.schema import is_json_schema
    from jscc.testing.util import http_get
 
-   schemas = [(path, name, data) for path, name, _, data in walk_json_data(patch) if is_json_schema(data)]
+   schemas = [(path, name, data) for path, name, _, data in walk_json_data() if is_json_schema(data)]
    metaschema = http_get('http://json-schema.org/draft-04/schema').json()
 
    @pytest.mark.parametrize('path,name,data', schemas)
@@ -269,7 +269,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
     return _traverse(block)(*args)
 
 
-def validate_null_type(path, data, pointer='', no_null=True, should_be_nullable=True, allow_object_null=(),
+def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable=True, allow_object_null=(),
                        allow_no_null=(), allow_null=()):
     """
     Warns and returns the number of errors relating to non-nullable optional fields and nullable required fields.
@@ -507,7 +507,7 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
                 if original == pointer:
                     warn('{} object array should require "id" field at {}'.format(path, pointer), ObjectIdWarning)
                 else:
-                    warn('{} object array should require "id" field at {} (from {})'.format( path, original, pointer),
+                    warn('{} object array should require "id" field at {} (from {})'.format(path, original, pointer),
                          ObjectIdWarning)
 
         return errors
@@ -566,7 +566,7 @@ def validate_ref(path, data):
     return 0
 
 
-def validate_schema_codelists_match(path, data, top, is_extension=False, is_profile=False, external_codelists=()):
+def validate_schema_codelists_match(path, data, top, is_extension=False, is_profile=False, external_codelists=None):
     """
     Warns and returns the number of errors relating to mismatches between codelist files and codelist references from
     JSON Schema.
@@ -577,6 +577,9 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
     :param external_codelists: names of codelists defined by the standard
     :type external_codelists: list, tuple or set
     """
+    if not external_codelists:
+        external_codelists = set()
+
     def collect_codelist_values(path, data, pointer=''):
         """
         Collects ``codelist`` values from JSON Schema.
@@ -605,7 +608,7 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
             if csvname.startswith(('+', '-')):
                 if csvname[1:] not in external_codelists:
                     errors += 1
-                    warn('{} {} modifies non-existent codelist'.format(path, csvname), SchemaCodelistsMatchWarning)
+                    warn('{} modifies non-existent codelist'.format(csvname), SchemaCodelistsMatchWarning)
             else:
                 codelist_files.add(csvname)
 
@@ -620,11 +623,11 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
 
     if unused_codelists:
         errors += 1
-        warn('repository has unused codelists: {}'.format(', '.join(sorted(unused_codelists))),
+        warn('unused codelists: {}'.format(', '.join(sorted(unused_codelists))),
              SchemaCodelistsMatchWarning)
     if missing_codelists:
         errors += 1
-        warn('repository is missing codelists: {}'.format(', '.join(sorted(missing_codelists))),
+        warn('missing codelists: {}'.format(', '.join(sorted(missing_codelists))),
              SchemaCodelistsMatchWarning)
 
     return errors

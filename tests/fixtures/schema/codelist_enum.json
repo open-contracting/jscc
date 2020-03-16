@@ -18,6 +18,15 @@
         ]
       }
     },
+    "passNoType": {
+      "codelist": "test.csv",
+      "openCodelist": false,
+      "items": {
+        "enum": [
+          "code"
+        ]
+      }
+    },
     "failOpenString": {
       "codelist": "failOpenString.csv",
       "openCodelist": true,

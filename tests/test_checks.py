@@ -8,7 +8,8 @@ from jsonref import JsonRef
 import jscc.testing.checks
 from jscc.exceptions import DuplicateKeyError
 from jscc.testing.checks import (get_empty_files, get_invalid_json_files, get_misindented_files,
-                                 validate_codelist_enum, validate_object_id, validate_schema_codelists_match)
+                                 validate_codelist_enum, validate_object_id, validate_ref,
+                                 validate_schema_codelists_match)
 from tests import parse, path
 
 
@@ -168,7 +169,19 @@ def test_validate_null_type():
 
     assert errors == len(records) == 3
     assert sorted(str(record.message) for record in records) == [
-        "tests/fixtures/schema/null_type.json nullable object ['object', 'null'] at /properties/object",
+        "tests/fixtures/schema/null_type.json non-nullable optional string at /properties/failOptional",
+        "tests/fixtures/schema/null_type.json nullable object ['object', 'null'] at /properties/failObject",
+        "tests/fixtures/schema/null_type.json nullable required ['string', 'null'] at /properties/failRequired",
+    ]
+
+
+def test_validate_null_type_no_null():
+    with pytest.warns(UserWarning) as records:
+        errors = validate('null_type', no_null=True)
+
+    assert errors == len(records) == 3
+    assert sorted(str(record.message) for record in records) == [
+        "tests/fixtures/schema/null_type.json nullable object ['object', 'null'] at /properties/failObject",
         "tests/fixtures/schema/null_type.json nullable required ['string', 'null'] at /properties/failRequired",
         "tests/fixtures/schema/null_type.json nullable required ['string', 'null'] at /properties/passOptional",
     ]
@@ -192,7 +205,15 @@ def test_validate_object_id():
     ]
 
 
-def test_validate_ref():
+def test_validate_ref_pass():
+    filepath = 'schema/schema.json'
+    with pytest.warns(None) as records:
+        errors = validate_ref(path(filepath), parse(filepath))
+
+    assert errors == len(records) == 0
+
+
+def test_validate_ref_fail():
     with pytest.warns(UserWarning) as records:
         errors = validate('ref')
 
@@ -220,8 +241,23 @@ def test_validate_schema_codelists_match():
     with pytest.warns(UserWarning) as records:
         errors = validate_schema_codelists_match(path(filepath), parse(filepath), path('schema'))
 
-    assert errors == len(records) == 2
+    assert errors == len(records) == 3
     assert sorted(str(record.message) for record in records) == [
-        'repository has unused codelists: extra.csv',
-        'repository is missing codelists: failOpenArray.csv, failOpenString.csv, missing.csv',
+        '+nonexistent.csv modifies non-existent codelist',
+        'missing codelists: failOpenArray.csv, failOpenString.csv, missing.csv',
+        'unused codelists: extra.csv',
+    ]
+
+
+def test_validate_schema_codelists_match_codelist():
+    filepath = 'schema/codelist_enum.json'
+    with pytest.warns(UserWarning) as records:
+        errors = validate_schema_codelists_match(path(filepath), parse(filepath), path('schema'), is_extension=True,
+                                                 external_codelists={'failOpenArray.csv', 'failOpenString.csv'})
+
+    assert errors == len(records) == 3
+    assert sorted(str(record.message) for record in records) == [
+        '+nonexistent.csv modifies non-existent codelist',
+        'missing codelists: missing.csv',
+        'unused codelists: extra.csv',
     ]
