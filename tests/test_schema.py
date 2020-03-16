@@ -4,8 +4,8 @@ import json
 import pytest
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.schema import (get_types, is_array_of_objects, is_codelist, is_json_merge_patch, is_json_schema,
-                         is_missing_property, rejecting_dict)
+from jscc.schema import (extend_schema, get_types, is_array_of_objects, is_codelist, is_json_merge_patch,
+                         is_json_schema, is_missing_property, rejecting_dict)
 from tests import parse, path
 
 
@@ -66,6 +66,23 @@ def test_is_missing_property(prop, expected):
 ])
 def test_get_types(field, expected):
     assert get_types(parse('schema.json')['properties'][field]) == expected
+
+
+def test_extend_schema():
+    schema = {
+        'title': 'A schema',
+    }
+    metadata = {
+        'dependencies': [
+            'https://raw.githubusercontent.com/open-contracting-extensions/ocds_process_title_extension/v1.1.4/extension.json',  # noqa
+        ]
+    }
+    codelists = set()
+
+    patched = extend_schema('release-schema.json', schema, metadata, codelists)
+
+    assert 'title' in patched
+    assert 'properties' in patched
 
 
 def test_rejecting_dict():

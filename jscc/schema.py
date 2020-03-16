@@ -2,8 +2,12 @@
 Methods for reasoning about JSON Schema and CSV codelists.
 """
 from collections import UserDict
+from copy import deepcopy
+
+import json_merge_patch
 
 from jscc.exceptions import DuplicateKeyError
+from jscc.testing.util import http_get
 
 
 def is_codelist(reader):
@@ -67,6 +71,36 @@ def get_types(field):
     if isinstance(field['type'], str):
         return [field['type']]
     return field['type']
+
+
+def extend_schema(basename, schema, metadata, codelists=None):
+    """
+    Patches a JSON Schema with an extension's dependencies, recursively.
+
+    If :code:`codelists` is provided, it will be updated with the codelists from the dependencies.
+
+    :param str basename: the JSON Schema file's basename
+    :param dict schema: the JSON Schema file's parsed contents
+    :param dict metadata: the extension metadata file's parsed contents
+    :param set codelists: any set
+    :returns: the patched schema
+    :rtype: dict
+    """
+    def recurse(metadata):
+        urls = metadata.get('dependencies', []) + metadata.get('testDependencies', [])
+        for metadata_url in urls:
+            patch_url = metadata_url.rsplit('/', 1)[0] + '/' + basename
+            metadata = http_get(metadata_url).json()
+            patch = http_get(patch_url).json()
+            if codelists is not None:
+                codelists.update(metadata.get('codelists', []))
+            json_merge_patch.merge(patched, patch)
+            recurse(metadata)
+
+    patched = deepcopy(schema)
+    recurse(metadata)
+
+    return patched
 
 
 class RejectingDict(UserDict):
