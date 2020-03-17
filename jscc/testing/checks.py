@@ -593,7 +593,7 @@ def validate_ref(path, data):
     """
     Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
 
-    :returns: ``1``
+    :returns: ``0`` or ``1``
     :rtype: int
     """
     ref = JsonRef.replace_refs(data)
