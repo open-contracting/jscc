@@ -73,7 +73,7 @@ def walk_csv_data(**kwargs):
                     rows = [row for row in reader]
                     yield (path, name, text, fieldnames, rows)
                 except _csv.Error as e:
-                    assert False, '{} is not valid CSV ({})'.format(path, e)
+                    continue
 
 
 def tracked(path):

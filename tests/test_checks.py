@@ -1,3 +1,4 @@
+import _csv
 import contextlib
 import json
 import os
@@ -7,7 +8,7 @@ from jsonref import JsonRef
 
 import jscc.testing.checks
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.checks import (get_empty_files, get_invalid_json_files, get_misindented_files,
+from jscc.testing.checks import (get_empty_files, get_invalid_csv_files, get_invalid_json_files, get_misindented_files,
                                  validate_codelist_enum, validate_object_id, validate_ref,
                                  validate_schema_codelists_match)
 from tests import parse, path
@@ -76,6 +77,18 @@ def test_get_invalid_json_files():
         assert isinstance(results['/invalid.json'], json.decoder.JSONDecodeError)
         assert str(results['/duplicate-key.json']) == 'x'
         assert str(results['/invalid.json']) == 'Expecting property name enclosed in double quotes: line 2 column 1 (char 2)'  # noqa
+
+
+def test_get_invalid_csv_files():
+    directory = os.path.realpath(path('csv'))
+    with chdir(directory):
+        results = {}
+        for result in get_invalid_csv_files():
+            results[result[0].replace(directory, '')] = result[1]
+
+            assert len(result) == 2
+
+        assert len(results) == 0
 
 
 def test_validate_codelist_enum():

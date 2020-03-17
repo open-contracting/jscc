@@ -64,6 +64,8 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
    warnings.formatwarning = formatwarning
 """  # noqa
 
+import _csv
+import csv
 import json
 import os
 import re
@@ -165,7 +167,7 @@ def get_invalid_json_files():
         from jscc.testing.checks import get_invalid_json_files
         from jscc.testing.util import warn_and_assert
 
-        def test_indent():
+        def test_invalid_json():
             warn_and_assert(get_invalid_json_files(), '{0} is not valid JSON: {1}',
                             'JSON files are invalid. See warnings below.')
     """
@@ -178,6 +180,28 @@ def get_invalid_json_files():
                         json.loads(text, object_pairs_hook=rejecting_dict)
                     except (json.decoder.JSONDecodeError, DuplicateKeyError) as e:
                         yield path, e
+
+
+def get_invalid_csv_files():
+    """
+    Yields the path and exception (as a tuple) of any CSV file that isn't valid.
+
+    pytest example::
+
+        from jscc.testing.checks import get_invalid_csv_files
+        from jscc.testing.util import warn_and_assert
+
+        def test_invalid_csv():
+            warn_and_assert(get_invalid_csv_files(), '{0} is not valid CSV: {1}',
+                            'CSV files are invalid. See warnings below.')
+    """
+    for path, name in walk():
+        if path.endswith('.csv'):
+            with open(path, newline='') as f:
+                try:
+                    csv.DictReader(f)
+                except _csv.Error as e:
+                    yield path, e
 
 
 def validate_schema(path, data, schema):

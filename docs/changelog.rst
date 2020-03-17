@@ -8,6 +8,7 @@ Added
 ~~~~~
 
 -  :meth:`jscc.schema.extend_schema`
+-  :meth:`jscc.testing.checks.get_invalid_csv_files`
 
 Changed
 ~~~~~~~
