@@ -1,6 +1,6 @@
 Schema
 ======
 
-.. automodule:: jscc.testing.schema
+.. automodule:: jscc.schema
    :members:
    :undoc-members:

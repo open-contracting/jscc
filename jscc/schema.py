@@ -1,5 +1,5 @@
 """
-Methods for reasoning about JSON Schema and CSV codelists.
+Methods for interacting with or reasoning about JSON Schema and CSV codelists.
 """
 from collections import UserDict
 from copy import deepcopy

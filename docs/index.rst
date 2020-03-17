@@ -3,13 +3,10 @@ JSON Schema and CSV Codelists (JSCC)
 
 .. include:: ../README.rst
 
-API
----
-
 .. toctree::
+   :caption: Contents
 
-   api/testing/index
-   api/exceptions
+   api/index
    changelog
 
 Copyright (c) 2020 Open Contracting Partnership, released under the BSD license
