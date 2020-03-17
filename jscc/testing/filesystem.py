@@ -72,7 +72,7 @@ def walk_csv_data(**kwargs):
                     fieldnames = reader.fieldnames
                     rows = [row for row in reader]
                     yield (path, name, text, fieldnames, rows)
-                except _csv.Error as e:
+                except _csv.Error:
                     continue
 
 
