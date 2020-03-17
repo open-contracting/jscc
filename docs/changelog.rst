@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.0.2 (Unreleased)
+0.0.2 (2020-03-16)
 ------------------
 
 Added
@@ -18,7 +18,7 @@ Changed
 -  :meth:`jscc.schema.is_codelist` accepts a list of field names, instead of a CSV reader
 -  :meth:`jscc.filesystem.walk_csv_data` returns text content, fieldnames, and rows, instead of a CSV reader
 
-0.0.1 (2020-03-13)
+0.0.1 (2020-03-15)
 ------------------
 
 First release.
