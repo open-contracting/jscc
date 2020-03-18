@@ -2,40 +2,20 @@
   "properties": {
     "pass": {
       "type": "array",
-      "wholeListMerge": true
-    },
-    "arrayOfObjects": {
-      "type": "array",
       "items": {
         "properties": {}
       },
       "wholeListMerge": true
     },
-    "string": {
-      "type": [
-        "string",
-        "null"
-      ],
+    "array": {
+      "type": "array",
       "wholeListMerge": true
-    },
-    "nullable": {
-      "type": [
-        "array",
-        "null"
-      ],
-      "wholeListMerge": true
-    },
-    "missing": {
-      "type": [
-        "array",
-        "null"
-      ],
-      "items": {
-        "properties": {}
-      }
     },
     "both": {
       "type": "array",
+      "items": {
+        "properties": {}
+      },
       "wholeListMerge": true,
       "omitWhenMerged": true
     }

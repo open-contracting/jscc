@@ -23,6 +23,15 @@
         "object",
         "null"
       ]
+    },
+    "failObjectArray": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "properties": {}
+      }
     }
   },
   "required": [

@@ -39,7 +39,7 @@ You can edit ``metaschema`` to be more strict and/or to add new properties. Then
        errors += validate_metadata_presence(path, data)
        errors += validate_object_id(path, JsonRef.replace_refs(data))
        errors += validate_null_type(path, data)
-       # Don't count these warnings as errors.
+       # Here, we don't add to `errors`, in order to not count these warnings as errors.
        validate_deep_properties(path, data)
 
        assert not errors, 'One or more JSON Schema files are invalid. See warnings below.'
@@ -62,7 +62,7 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
        return str(message).replace(cwd + os.sep, '')
 
    warnings.formatwarning = formatwarning
-"""  # noqa
+"""  # noqa: E501
 
 import _csv
 import csv
@@ -101,7 +101,8 @@ def get_empty_files(include=_true):
     """
     Yields the path (as a tuple) of any file that is empty.
 
-    JSON files are empty if their JSON data are empty. Other files are empty if they contain only whitespace.
+    JSON files are empty if their parsed contents are empty (empty array, empty object, empty string or ``null``).
+    Other files are empty if they contain whitespace only.
 
     :param function include: a method that accepts a file path and file name, and returns whether to test the file
                              (default true)
@@ -139,6 +140,9 @@ def get_misindented_files(include=_true):
     """
     Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
 
+    JSON files must be indented with two spaces, musn't escape non-ASCII characters (no ``\\uXXXX`` sequences), and
+    must have a newline at end of file.
+
     :param function include: a method that accepts a file path and file name, and returns whether to test the file
                              (default true)
 
@@ -161,6 +165,10 @@ def get_misindented_files(include=_true):
 def get_invalid_json_files():
     """
     Yields the path and exception (as a tuple) of any JSON file that isn't valid.
+
+    JSON files must be parsed without error by the ``json`` module, and JSON objects mustn't have duplicate keys.
+
+    See https://tools.ietf.org/html/rfc7493#section-2.3
 
     pytest example::
 
@@ -186,6 +194,8 @@ def get_invalid_csv_files():
     """
     Yields the path and exception (as a tuple) of any CSV file that isn't valid.
 
+    CSV files must be parsed without error by the ``csv`` module.
+
     pytest example::
 
         from jscc.testing.checks import get_invalid_csv_files
@@ -208,6 +218,8 @@ def validate_schema(path, data, schema):
     """
     Warns and returns the number of errors relating to JSON Schema validation.
 
+    Uses the `jsonschema <https://python-jsonschema.readthedocs.io/>`__ module.
+
     :param object schema: the metaschema against which to validate
     :returns: the number of errors
     :rtype: int
@@ -226,6 +238,8 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
     """
     Warns and returns the number of errors relating to the letter case of properties and definitions.
 
+    Property names must be lowerCamelCase. Definition names must be UpperCamelCase. All must be ASCII letters only.
+
     :param property_exceptions: property names to ignore
     :type property_exceptions: list, tuple or set
     :param definition_exceptions: definition names to ignore
@@ -242,13 +256,13 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
             for key in data.keys():
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
-                    warn('{} {}/{} should be lowerCamelCase ASCII letters'.format(path, pointer, key),
+                    warn("{}: {}/{} field isn't lowerCamelCase ASCII letters".format(path, pointer, key),
                          LetterCaseWarning)
         elif parent == 'definitions':
             for key in data.keys():
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
-                    warn('{} {}/{} should be UpperCamelCase ASCII letters'.format(path, pointer, key),
+                    warn("{}: {}/{} block isn't UpperCamelCase ASCII letters".format(path, pointer, key),
                          LetterCaseWarning)
 
         return errors
@@ -260,11 +274,15 @@ def validate_metadata_presence(*args, allow_missing=_false):
     """
     Warns and returns the number of errors relating to metadata in a JSON Schema.
 
+    The root schema and each field must have `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__
+    `"title" and "description" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.1>`__
+    properties, unless it has a `"$ref" <https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03>`__ property.
+
     :param function allow_missing: a method that accepts a JSON Pointer, and returns whether the field is allowed to
                                    not have a "title" or "description" property
     :returns: the number of errors
     :rtype: int
-    """
+    """  # noqa: E501
     schema_fields = {'definitions', 'deprecated', 'items', 'patternProperties', 'properties'}
     schema_sections = {'patternProperties'}
     required_properties = {'title', 'description'}
@@ -285,24 +303,32 @@ def validate_metadata_presence(*args, allow_missing=_false):
                 # If a field has `$ref`, then its `title` and `description` might defer to the reference.
                 if is_missing_property(data, prop) and '$ref' not in data and not allow_missing(pointer):
                     errors += 1
-                    warn('{} is missing {}/{}'.format(path, pointer, prop), MetadataPresenceWarning)
+                    warn('{} is missing "{}" at {}'.format(path, prop, pointer), MetadataPresenceWarning)
 
             if 'type' not in data and '$ref' not in data and 'oneOf' not in data:
                 errors += 1
-                warn('{0} is missing {1}/type or {1}/$ref or {1}/oneOf'.format(path, pointer), MetadataPresenceWarning)
+                warn('{} is missing "type" or "$ref" or "oneOf" at {}'.format(path, pointer), MetadataPresenceWarning)
 
         return errors
 
     return _traverse(block)(*args)
 
 
-def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable=True, allow_object_null=(),
+def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, allow_object_null=(),
                        allow_no_null=(), allow_null=()):
     """
     Warns and returns the number of errors relating to non-nullable optional fields and nullable required fields.
 
+    If :code:`no_null` is ``True``, then `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__
+    properties mustn't include "null".
+
+    Otherwise, the "type" properties for objects and :meth:`arrays of objects<json.schema.is_array_of_objects>` mustn't
+    include "null". If a field is `required <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.3>`__,
+    its "type" property mustn't include "null". If a field isn't required, and it isn't an object or array of objects,
+    its "type" property must include "null".
+
     :param bool no_null: whether the standard disallows "null" in the "type" property of any field
-    :param bool should_be_nullable: whether the field, in context, should have "null" in its "type" property
+    :param bool expect_null: whether the field, in context, is expected to have "null" in its "type" property
     :param allow_object_null: JSON Pointers of fields whose "type" properties are allowed to include "object", "null"
     :type allow_object_null: list, tuple or set
     :param allow_no_null: JSON Pointers of fields whose "type" properties are allowed to exclude "null"
@@ -311,7 +337,7 @@ def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable
     :type allow_null: list, tuple or set
     :returns: the number of errors
     :rtype: int
-    """
+    """  # noqa: E501
     errors = 0
 
     kwargs = {
@@ -321,7 +347,7 @@ def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable
     }
 
     if no_null:
-        should_be_nullable = False
+        expect_null = False
 
     if isinstance(data, list):
         for index, item in enumerate(data):
@@ -329,35 +355,32 @@ def validate_null_type(path, data, pointer='', no_null=False, should_be_nullable
                                          no_null=no_null)
     elif isinstance(data, dict):
         if 'type' in data and pointer:
-            nullable = 'null' in data['type']
-            # Objects should not be nullable.
-            if 'object' in data['type'] and 'null' in data['type'] and pointer not in allow_object_null:
+            null_in_type = 'null' in data['type']
+            null_not_allowed = 'object' in data['type'] or is_array_of_objects(data)
+            # Objects and arrays of objects mustn't be nullable.
+            if null_in_type and null_not_allowed and pointer not in allow_object_null:
                 errors += 1
-                warn('{} nullable object {} at {}'.format(path, data['type'], pointer), NullTypeWarning)
-            elif should_be_nullable:
-                # A special case: If it's not required (should be nullable), but isn't nullable, it's okay if and only
-                # if it's an object or an array of objects/references.
-                if not nullable and data['type'] != 'object' and not is_array_of_objects(data) and pointer not in allow_no_null:  # noqa
+                warn('{} includes "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
+            elif expect_null:
+                if not null_in_type and not null_not_allowed and pointer not in allow_no_null:
                     errors += 1
-                    warn('{} non-nullable optional {} at {}'.format(path, data['type'], pointer), NullTypeWarning)
-            elif nullable and pointer not in allow_null:
+                    warn('{} is missing "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
+            elif null_in_type and pointer not in allow_null:
                 errors += 1
-                warn('{} nullable required {} at {}'.format(path, data['type'], pointer), NullTypeWarning)
+                warn('{} includes "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
 
         required = data.get('required', [])
 
         for key, value in data.items():
             if key in ('properties', 'definitions'):
                 for k, v in data[key].items():
-                    should_be_nullable = key == 'properties' and k not in required
-
+                    expect_null = key == 'properties' and k not in required
                     errors += validate_null_type(path, v, pointer='{}/{}/{}'.format(pointer, key, k), **kwargs,
-                                                 no_null=no_null, should_be_nullable=should_be_nullable)
+                                                 no_null=no_null, expect_null=expect_null)
             else:
                 v = data['items'] if key == 'items' else value
-
                 errors += validate_null_type(path, v, pointer='{}/{}'.format(pointer, key), **kwargs,
-                                             no_null=no_null, should_be_nullable=key != 'items')
+                                             no_null=no_null, expect_null=key != 'items')
 
     return errors
 
@@ -368,6 +391,14 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
 
     If a field has a "codelist" property but no "type" property, its "type" is assumed to be "array", unless a fallback
     "type" is provided via :code:`fallback`.
+
+    If the "codelist" property is set:
+
+    -  If the "openCodelist" property is set to ``true``, then the "enum" property mustn't be set.
+    -  If the "openCodelist" property is set to ``false``, then the "enum" property must be set, its value must include
+       ``null`` if the "type" property includes "null", and its value must match the codes in the codelist.
+
+    If the "enum" property is set, then the "codelist" and "openCodelist" properties must be set.
 
     :param dict fallback: a dict in which keys are JSON Pointers and values are lists of "type" values
     :param function allow_enum: a method that accepts a JSON Pointer, and returns whether the field is allowed to set
@@ -393,14 +424,14 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
 
             if data['openCodelist']:
                 if ('string' in types and 'enum' in data or 'array' in types and 'enum' in data['items']):
-                    # Open codelists shouldn't set `enum`.
                     errors += 1
-                    warn('{} must not set "enum" for open codelist at {}'.format(path, pointer), CodelistEnumWarning)
+                    warn('{} sets "enum", though "openCodelist" is true, at {}'.format(path, pointer),
+                         CodelistEnumWarning)
             else:
                 if 'string' in types and 'enum' not in data or 'array' in types and 'enum' not in data['items']:
-                    # Fields with closed codelists should set `enum`.
                     errors += 1
-                    warn('{} must set "enum" for closed codelist at {}'.format(path, pointer), CodelistEnumWarning)
+                    warn('{} is missing "enum", though "openCodelist" is false, at {}'.format(path, pointer),
+                         CodelistEnumWarning)
 
                     actual = None
                 elif 'string' in types:
@@ -410,13 +441,10 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
 
                 # It'd be faster to cache the CSVs, but most extensions have only one closed codelist.
                 for _, csvname, _, _, rows in walk_csv_data():
-                    # The codelist's CSV file should exist.
+                    # The codelist's CSV file must exist.
                     if csvname == data['codelist']:
-                        # The codelist's CSV file should match the `enum` values, if the field is set.
                         if actual:
                             expected = set([row['Code'] for row in rows])
-
-                            # Add None if the field is nullable.
                             if 'string' in types and 'null' in types:
                                 expected.add(None)
 
@@ -424,21 +452,20 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                                 added, removed = difference(actual, expected)
 
                                 errors += 1
-                                warn('{} has mismatch between "enum" and codelist at {}{}{}'.format(
-                                    path, pointer, added, removed), CodelistEnumWarning)
-
+                                warn("{}: {}/enum doesn't match codelists/{}{}{}".format(
+                                    path, pointer, data['codelist'], added, removed), CodelistEnumWarning)
                         break
                 else:
                     # When validating a patched schema, the above code will fail to find the core codelists in an
                     # extension, but that is not an error. This overlaps with `validate_schema_codelists_match`.
                     if not allow_missing(data['codelist']):
                         errors += 1
-                        warn('{} is missing codelist: {}'.format(path, data['codelist']), CodelistEnumWarning)
+                        warn("{} refers to missing file codelists/{} at {}".format(
+                             path, data['codelist'], pointer), CodelistEnumWarning)
         elif 'enum' in data and parent != 'items' or 'items' in data and 'enum' in data['items']:
             if not allow_enum(pointer):
-                # Fields with `enum` should set closed codelists.
                 errors += 1
-                warn('{} has "enum" without codelist at {}'.format(path, pointer), CodelistEnumWarning)
+                warn('{} is missing "codelist" and "openCodelist" at {}'.format(path, pointer), CodelistEnumWarning)
 
         return errors
 
@@ -448,6 +475,9 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
 def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
     """
     Warns and returns the number of errors relating to the "type" property under an "items" property.
+
+    The "type" property under an "items" property must only include "array" (e.g. for geometries), "number"
+    (e.g. for coordinates) and/or "string".
 
     :param additional_valid_types: additional valid values of the "type" property under an "items" property
     :type additional_valid_types: list, tuple or set
@@ -473,7 +503,7 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
             for _type in get_types(data):
                 if _type not in valid_types and pointer not in allow_invalid:
                     errors += 1
-                    warn('{} "{}" is an invalid "items" "type" at {}'.format(path, _type, pointer), ItemsTypeWarning)
+                    warn('{} includes "{}" in "items/type" at {}'.format(path, _type, pointer), ItemsTypeWarning)
 
         return errors
 
@@ -482,7 +512,9 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
 
 def validate_deep_properties(*args, allow_deep=()):
     """
-    Warns about deep objects, which, if appropriate, should be modeled as new definitions.
+    Warns and returns the number of errors relating to deep objects.
+
+    The schema must use "definitions" instead of nesting "properties".
 
     :param allow_deep: JSON Pointers of fields to ignore
     :type allow_deep: list, tuple or set
@@ -500,7 +532,7 @@ def validate_deep_properties(*args, allow_deep=()):
 
         if pointer and grandparent != 'definitions' and 'properties' in data and pointer not in allow_deep:
             errors += 1
-            warn('{} has deep properties at {}'.format(path, pointer), DeepPropertiesWarning)
+            warn('{} has "properties" within "properties" at {}'.format(path, pointer), DeepPropertiesWarning)
 
         return errors
 
@@ -510,6 +542,9 @@ def validate_deep_properties(*args, allow_deep=()):
 def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     """
     Warns and returns the number of errors relating to objects within arrays lacking "id" fields.
+
+    If an array field's "wholeListMerge" property isn't set or is set to ``false``, then the object fields under it
+    must have an "id" field, and the "id" field must be required.
 
     :param function allow_missing: a method that accepts a JSON Pointer, and returns whether the field is allowed to
                                    not have an "id" field
@@ -521,9 +556,11 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     def block(path, data, pointer):
         errors = 0
 
+        if data.get('wholeListMerge') or allow_missing(pointer):
+            return errors
+
         # If it's an array of objects.
-        if ('type' in data and 'array' in data['type'] and 'properties' in data.get('items', {}) and
-                not allow_missing(pointer)):
+        if 'type' in data and 'array' in data['type'] and 'properties' in data.get('items', {}):
             required = data['items'].get('required', [])
 
             if hasattr(data['items'], '__reference__'):
@@ -532,19 +569,19 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
                 original = pointer
 
             # See https://standard.open-contracting.org/latest/en/schema/merging/#whole-list-merge
-            if 'id' not in data['items']['properties'] and not data.get('wholeListMerge'):
+            if 'id' not in data['items']['properties']:
                 errors += 1
                 if original == pointer:
-                    warn('{} object array has no "id" field at {}'.format(path, pointer), ObjectIdWarning)
+                    warn('{} is missing "id" in "items/properties" at {}'.format(path, pointer), ObjectIdWarning)
                 else:
-                    warn('{} object array has no "id" field at {} (from {})'.format(path, original, pointer),
+                    warn('{} is missing "id" in "items/properties" at {} (from {})'.format(path, original, pointer),
                          ObjectIdWarning)
-            elif 'id' not in required and not data.get('wholeListMerge') and original not in allow_optional:
+            elif 'id' not in required and original not in allow_optional:
                 errors += 1
                 if original == pointer:
-                    warn('{} object array should require "id" field at {}'.format(path, pointer), ObjectIdWarning)
+                    warn('{} is missing "id" in "items/required" at {}'.format(path, pointer), ObjectIdWarning)
                 else:
-                    warn('{} object array should require "id" field at {} (from {})'.format(path, original, pointer),
+                    warn('{} is missing "id" in "items/required" at {} (from {})'.format(path, original, pointer),
                          ObjectIdWarning)
 
         return errors
@@ -552,37 +589,36 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     return _traverse(block)(*args)
 
 
-def validate_merge_properties(*args, allow_null=()):
+def validate_merge_properties(*args):
     """
     Warns and returns the number of errors relating to missing or extra merge properties.
 
-    :param allow_null: JSON Pointers of fields whose "type" properties are allowed to include "null", even if they are
-                       arrays of objects that are expected to set "wholeListMerge" properties
-    :type allow_null: list, tuple or set
+    The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and musn't be set to ``false``. The
+    "wholeListMerge" property must be set on non-nullable arrays of objects only.
+
+    See https://standard.open-contracting.org/1.1/en/schema/merging/#whole-list-merge
+
     :returns: the number of errors
     :rtype: int
     """
     def block(path, data, pointer):
         errors = 0
 
-        types = get_types(data)
+        if data.get('omitWhenMerged') is False:
+            errors += 1
+            warn('{} sets "omitWhenMerged" to false at {}'.format(path, pointer), MergePropertiesWarning)
+        if data.get('wholeListMerge') is False:
+            errors += 1
+            warn('{} sets "wholeListMerge" to false at {}'.format(path, pointer), MergePropertiesWarning)
 
         if 'wholeListMerge' in data:
-            if 'array' not in types:
+            if not is_array_of_objects(data):
                 errors += 1
-                warn('{} "wholeListMerge" is set on non-array at {}'.format(path, pointer), MergePropertiesWarning)
-            elif 'null' in types:
+                warn('{} sets "wholeListMerge", though the field is not an array of objects, at {}'.format(path, pointer), MergePropertiesWarning)  # noqa: E501
+            if 'omitWhenMerged' in data:
                 errors += 1
-                warn('{} "wholeListMerge" is set on nullable at {}'.format(path, pointer), MergePropertiesWarning)
-        elif is_array_of_objects(data) and 'null' in types and pointer not in allow_null:
-            errors += 1
-            warn('{} array should be "wholeListMerge" instead of nullable at {}'.format(path, pointer),
-                 MergePropertiesWarning)
-
-        if data.get('omitWhenMerged') and data.get('wholeListMerge'):
-            errors += 1
-            warn('{} both "omitWhenMerged" and "wholeListMerge" are set at {}'.format(path, pointer),
-                 MergePropertiesWarning)
+                warn('{} sets both "omitWhenMerged" and "wholeListMerge" at {}'.format(path, pointer),
+                     MergePropertiesWarning)
 
         return errors
 
@@ -592,6 +628,8 @@ def validate_merge_properties(*args, allow_null=()):
 def validate_ref(path, data):
     """
     Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
+
+    Uses the `jsonref <https://jsonref.readthedocs.io/>`__ module.
 
     :returns: ``0`` or ``1``
     :rtype: int
@@ -612,6 +650,10 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
     """
     Warns and returns the number of errors relating to mismatches between codelist files and codelist references from
     JSON Schema.
+
+    All codelist filenames that don't start with ``+`` or ``-`` must match codelist references. All codelist references
+    must match codelist filenames or be in :code:`external_codelists`. All codelist filenames that start with ``+`` or
+    ``-`` must be in :code:`external_codelists`.
 
     :param str top: the file path of the directory tree
     :param bool is_extension: whether the repository is an extension or a profile
@@ -652,7 +694,7 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
             if csvname.startswith(('+', '-')):
                 if csvname[1:] not in external_codelists:
                     errors += 1
-                    warn('{} modifies non-existent codelist'.format(csvname), SchemaCodelistsMatchWarning)
+                    warn('{} patches unknown codelist'.format(csvname), SchemaCodelistsMatchWarning)
             else:
                 codelist_files.add(csvname)
 
