@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='jscc',
-    version='0.0.2',
+    version='0.0.3',
     author='Open Contracting Partnership and Open Data Services Co-operative Limited',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/jscc',
