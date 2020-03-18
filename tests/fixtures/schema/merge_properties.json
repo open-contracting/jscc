@@ -11,6 +11,12 @@
       "type": "array",
       "wholeListMerge": true
     },
+    "omitWhenMergedFalse": {
+      "omitWhenMerged": false
+    },
+    "wholeListMergeFalse": {
+      "wholeListMerge": false
+    },
     "both": {
       "type": "array",
       "items": {

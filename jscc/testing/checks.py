@@ -604,14 +604,13 @@ def validate_merge_properties(*args):
     def block(path, data, pointer):
         errors = 0
 
-        if data.get('omitWhenMerged') is False:
+        if 'omitWhenMerged' in data and not data['omitWhenMerged']:
             errors += 1
-            warn('{} sets "omitWhenMerged" to false at {}'.format(path, pointer), MergePropertiesWarning)
-        if data.get('wholeListMerge') is False:
+            warn('{} sets "omitWhenMerged" to false or null at {}'.format(path, pointer), MergePropertiesWarning)
+        if 'wholeListMerge' in data and not data['wholeListMerge']:
             errors += 1
-            warn('{} sets "wholeListMerge" to false at {}'.format(path, pointer), MergePropertiesWarning)
-
-        if 'wholeListMerge' in data:
+            warn('{} sets "wholeListMerge" to false or null at {}'.format(path, pointer), MergePropertiesWarning)
+        elif 'wholeListMerge' in data:
             if not is_array_of_objects(data):
                 errors += 1
                 warn('{} sets "wholeListMerge", though the field is not an array of objects, at {}'.format(path, pointer), MergePropertiesWarning)  # noqa: E501

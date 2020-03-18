@@ -152,10 +152,12 @@ def test_validate_merge_properties():
         errors = validate('merge_properties')
 
     assert sorted(str(record.message) for record in records) == [
+        'tests/fixtures/schema/merge_properties.json sets "omitWhenMerged" to false or null at /properties/omitWhenMergedFalse',  # noqa
+        'tests/fixtures/schema/merge_properties.json sets "wholeListMerge" to false or null at /properties/wholeListMergeFalse',  # noqa
         'tests/fixtures/schema/merge_properties.json sets "wholeListMerge", though the field is not an array of objects, at /properties/array',  # noqa
         'tests/fixtures/schema/merge_properties.json sets both "omitWhenMerged" and "wholeListMerge" at /properties/both',  # noqa
     ]
-    assert errors == len(records) == 2
+    assert errors == len(records) == 4
 
 
 def test_validate_metadata_presence():

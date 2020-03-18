@@ -9,6 +9,7 @@ Added
 
 -  :meth:`jscc.schema.extend_schema`
 -  :meth:`jscc.testing.checks.get_invalid_csv_files`
+-  :meth:`jscc.testing.checks.validate_merge_properties` warns if merge properties are set to ``false`` or ``null``.
 -  Expand docstrings for ``jscc.schema.checks.validate_*`` methods.
 
 Changed
@@ -20,7 +21,7 @@ Changed
 -  :meth:`jscc.testing.filesystem.walk_csv_data` returns text content, fieldnames, and rows, instead of a CSV reader.
 -  ``jscc.testing.schema`` is moved to :mod:`jscc.schema`.
 -  ``jscc.schema.is_property_missing`` is renamed to :meth:`jscc.schema.is_missing_property`.
--  ``should_be_nullable`` argument to :meth:`jscc.testing.checks.validate_null_type` is renamed to ``expect_null``.
+-  :meth:`jscc.testing.checks.validate_null_type`'s ``should_be_nullable`` argument is renamed to ``expect_null``.
 -  Clarify warning messages.
 
 0.0.1 (2020-03-15)
