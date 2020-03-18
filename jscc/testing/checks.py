@@ -274,7 +274,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
     """
     Warns and returns the number of errors relating to metadata in a JSON Schema.
 
-    The root schema and each field must have `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__
+    The root schema and each field must have `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__,
     `"title" and "description" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.1>`__
     properties, unless it has a `"$ref" <https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03>`__ property.
 
@@ -319,13 +319,12 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
     """
     Warns and returns the number of errors relating to non-nullable optional fields and nullable required fields.
 
-    If :code:`no_null` is ``True``, then `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__
-    properties mustn't include "null".
+    If :code:`no_null` is ``True``, then "type" properties mustn't include "null".
 
-    Otherwise, the "type" properties for objects and :meth:`arrays of objects<json.schema.is_array_of_objects>` mustn't
-    include "null". If a field is `required <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.3>`__,
-    its "type" property mustn't include "null". If a field isn't required, and it isn't an object or array of objects,
-    its "type" property must include "null".
+    Otherwise, the "type" properties for objects and arrays of objects mustn't include "null". If a field is `required
+    <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.3>`__, then its "type" property
+    mustn't include "null". If a field isn't required (and it isn't an object or array of objects), then its "type"
+    property must include "null".
 
     :param bool no_null: whether the standard disallows "null" in the "type" property of any field
     :param bool expect_null: whether the field, in context, is expected to have "null" in its "type" property
@@ -389,8 +388,8 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
     """
     Warns and returns the number of errors relating to codelists in a JSON Schema.
 
-    If a field has a "codelist" property but no "type" property, its "type" is assumed to be "array", unless a fallback
-    "type" is provided via :code:`fallback`.
+    If a field has a "codelist" property but no "type" property (e.g. if the "codelist" property is being overwritten),
+    then its "type" is assumed to be "array" unless a fallback "type" is provided via :code:`fallback`.
 
     If the "codelist" property is set:
 
@@ -543,8 +542,8 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     """
     Warns and returns the number of errors relating to objects within arrays lacking "id" fields.
 
-    If an array field's "wholeListMerge" property isn't set or is set to ``false``, then the object fields under it
-    must have an "id" field, and the "id" field must be required.
+    If an array field's "wholeListMerge" property isn't set or is set to ``false`` or ``null`, then the object fields
+    under it must have an "id" field, and the "id" field must be required.
 
     :param function allow_missing: a method that accepts a JSON Pointer, and returns whether the field is allowed to
                                    not have an "id" field
@@ -593,8 +592,8 @@ def validate_merge_properties(*args):
     """
     Warns and returns the number of errors relating to missing or extra merge properties.
 
-    The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and musn't be set to ``false``. The
-    "wholeListMerge" property must be set on non-nullable arrays of objects only.
+    The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and musn't be set to ``false`` or
+    ``null``. The "wholeListMerge" property must be set on non-nullable arrays of objects only.
 
     See https://standard.open-contracting.org/1.1/en/schema/merging/#whole-list-merge
 
