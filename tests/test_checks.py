@@ -210,7 +210,7 @@ def test_validate_object_id():
     def allow_missing(pointer):
         return pointer == '/properties/allowMissing'
 
-    filepath = 'schema/object_id.json'
+    filepath = os.path.join('schema', 'object_id.json')
     with pytest.warns(UserWarning) as records:
         errors = validate_object_id(path(filepath), JsonRef.replace_refs(parse(filepath)), allow_missing=allow_missing,
                                     allow_optional='/properties/allowOptional')
