@@ -25,7 +25,7 @@ def chdir(path):
 
 def t(message):
     path, rest = message.split(' ', 1)
-    return '{} {}'.join(path.replace('/', os.sep), rest)
+    return '{} {}'.format(path.replace('/', os.sep), rest)
 
 
 def validate(name, *args, **kwargs):
