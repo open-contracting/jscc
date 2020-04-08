@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.0.4 (Unreleased)
+------------------
+
+Fixed
+~~~~~
+
+-  :meth:`jscc.testing.filesystem.tracked` supports Windows.
+
 0.0.3 (2020-03-17)
 ------------------
 

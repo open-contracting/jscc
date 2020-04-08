@@ -6,14 +6,15 @@ import _csv
 import csv
 import json
 import os
+from fnmatch import fnmatch
 from io import StringIO
 
 untracked = {
-    '.egg-info/',
-    '/.tox/',
-    '/.ve/',
-    '/htmlcov/',
-    '/node_modules/',
+    '*.egg-info',
+    '.tox',
+    '.ve',
+    'htmlcov',
+    'node_modules',
 }
 
 
@@ -82,4 +83,4 @@ def tracked(path):
 
     :param str path: a file path
     """
-    return not any(substring in path for substring in untracked)
+    return not any(fnmatch(part, pattern) for pattern in untracked for part in path.split(os.sep))
