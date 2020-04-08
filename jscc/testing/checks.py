@@ -1,7 +1,9 @@
 """
-This module offers ``get_*`` methods to check for empty files, misindented JSON files, and invalid JSON files. See "pytest examples" for usage examples.
+This module offers ``get_*`` methods to check for empty files, misindented JSON files, and invalid JSON files. See
+"pytest examples" for usage examples.
 
-This module also offers ``validate_*`` methods to test JSON Schema. Each method's behavior is customizable, and not all methods are relevant to all schema.
+This module also offers ``validate_*`` methods to test JSON Schema. Each method's behavior is customizable, and not all
+methods are relevant to all schema.
 
 The typical usage is to first define a test method like so:
 
@@ -18,7 +20,8 @@ The typical usage is to first define a test method like so:
    def test_schema_valid(path, name, data):
        validate_json_schema(path, name, data, metaschema)
 
-You can edit ``metaschema`` to be more strict and/or to add new properties. Then, define the ``validate_json_schema`` method that uses the ``validate_*`` methods. For example:
+You can edit ``metaschema`` to be more strict and/or to add new properties. Then, define the ``validate_json_schema``
+method that uses the ``validate_*`` methods. For example:
 
 .. code-block:: python
 
@@ -62,7 +65,7 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
        return str(message).replace(cwd + os.sep, '')
 
    warnings.formatwarning = formatwarning
-"""  # noqa: E501
+"""
 
 import _csv
 import csv
@@ -336,7 +339,7 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
     :type allow_null: list, tuple or set
     :returns: the number of errors
     :rtype: int
-    """  # noqa: E501
+    """
     errors = 0
 
     kwargs = {
@@ -612,11 +615,12 @@ def validate_merge_properties(*args):
         elif 'wholeListMerge' in data:
             if not is_array_of_objects(data):
                 errors += 1
-                warn('{} sets "wholeListMerge", though the field is not an array of objects, at {}'.format(path, pointer), MergePropertiesWarning)  # noqa: E501
+                warn('{} sets "wholeListMerge", though the field is not an array of objects, at {}'.format(
+                    path, pointer), MergePropertiesWarning)
             if 'omitWhenMerged' in data:
                 errors += 1
-                warn('{} sets both "omitWhenMerged" and "wholeListMerge" at {}'.format(path, pointer),
-                     MergePropertiesWarning)
+                warn('{} sets both "omitWhenMerged" and "wholeListMerge" at {}'.format(
+                    path, pointer), MergePropertiesWarning)
 
         return errors
 
