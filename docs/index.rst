@@ -1,5 +1,5 @@
-JSON Schema and CSV Codelists (JSCC)
-====================================
+JSON Schema and CSV Codelists (JSCC) |release|
+==============================================
 
 .. include:: ../README.rst
 
