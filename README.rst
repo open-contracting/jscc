@@ -22,4 +22,3 @@ If you are viewing this on GitHub or PyPi, open the `full documentation <https:/
    :target: https://coveralls.io/github/open-contracting/jscc?branch=master
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/jscc.svg
    :target: https://pypi.org/project/jscc/
-
