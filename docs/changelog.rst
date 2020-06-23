@@ -1,12 +1,13 @@
 Changelog
 =========
 
-0.0.4 (Unreleased)
+0.0.4 (2020-06-23)
 ------------------
 
 Fixed
 ~~~~~
 
+-  :meth:`jscc.testing.checks.validate_ref` supports integers in JSON Pointers.
 -  :meth:`jscc.testing.filesystem.tracked` supports Windows.
 
 0.0.3 (2020-03-17)
