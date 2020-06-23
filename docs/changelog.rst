@@ -8,6 +8,7 @@ Fixed
 ~~~~~
 
 -  :meth:`jscc.testing.checks.validate_ref` supports integers in JSON Pointers.
+-  :meth:`jscc.testing.checks.validate_metadata_presence` allows missing ``type`` property if configured via ``allow_missing`` argument.
 -  :meth:`jscc.testing.filesystem.tracked` supports Windows.
 
 0.0.3 (2020-03-17)

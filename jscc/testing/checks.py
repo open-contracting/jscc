@@ -308,7 +308,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
                     errors += 1
                     warn('{} is missing "{}" at {}'.format(path, prop, pointer), MetadataPresenceWarning)
 
-            if 'type' not in data and '$ref' not in data and 'oneOf' not in data:
+            if 'type' not in data and '$ref' not in data and 'oneOf' not in data and not allow_missing(pointer):
                 errors += 1
                 warn('{} is missing "type" or "$ref" or "oneOf" at {}'.format(path, pointer), MetadataPresenceWarning)
 
