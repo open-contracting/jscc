@@ -2,7 +2,6 @@
 Methods for interacting with or reasoning about the filesystem.
 """
 
-import _csv
 import csv
 import json
 import os
@@ -73,7 +72,7 @@ def walk_csv_data(**kwargs):
                     fieldnames = reader.fieldnames
                     rows = [row for row in reader]
                     yield (path, name, text, fieldnames, rows)
-                except _csv.Error:
+                except csv.Error:
                     continue
 
 

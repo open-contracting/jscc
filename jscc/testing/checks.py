@@ -67,7 +67,6 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
    warnings.formatwarning = formatwarning
 """
 
-import _csv
 import csv
 import json
 import os
@@ -213,7 +212,7 @@ def get_invalid_csv_files():
             with open(path, newline='') as f:
                 try:
                     csv.DictReader(f)
-                except _csv.Error as e:
+                except csv.Error as e:
                     yield path, e
 
 
