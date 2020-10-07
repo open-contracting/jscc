@@ -67,6 +67,10 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
    warnings.formatwarning = formatwarning
 """
 
+# In this module, it would be simpler to use a tuple for each `pointer` keyword argument, especially when calculating
+# the last component of the pointer (the "parent"). However, it's easier when *using* the module to write JSON Pointers
+# as strings. Therefore, we use strings instead of tuples.
+
 import csv
 import json
 import os
