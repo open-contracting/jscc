@@ -80,7 +80,7 @@ def test_get_invalid_json_files():
         assert isinstance(results['duplicate-key.json'], DuplicateKeyError)
         assert isinstance(results['invalid.json'], json.decoder.JSONDecodeError)
         assert str(results['duplicate-key.json']) == 'x'
-        assert str(results['invalid.json']) == 'Expecting property name enclosed in double quotes: line 2 column 1 (char 2)'  # noqa
+        assert str(results['invalid.json']) == 'Expecting property name enclosed in double quotes: line 2 column 1 (char 2)'  # noqa: E501
 
 
 def test_get_invalid_csv_files():
@@ -113,7 +113,7 @@ def test_validate_codelist_enum():
         'codelist_enum.json sets "enum", though "openCodelist" is true, at /properties/failOpenArray',
         'codelist_enum.json sets "enum", though "openCodelist" is true, at /properties/failOpenString',
         "codelist_enum.json: /properties/mismatchArray/enum doesn't match codelists/test.csv; added {'extra'}",
-        "codelist_enum.json: /properties/mismatchString/enum doesn't match codelists/test.csv; added {'extra'}; removed {None}",  # noqa
+        "codelist_enum.json: /properties/mismatchString/enum doesn't match codelists/test.csv; added {'extra'}; removed {None}",  # noqa: E501
     ]
     assert errors == len(records) == 9
 
@@ -157,10 +157,10 @@ def test_validate_merge_properties():
         errors = validate('merge_properties')
 
     assert sorted(str(record.message) for record in records) == [
-        t('tests/fixtures/schema/merge_properties.json sets "omitWhenMerged" to false or null at /properties/omitWhenMergedFalse'),  # noqa: E501
-        t('tests/fixtures/schema/merge_properties.json sets "wholeListMerge" to false or null at /properties/wholeListMergeFalse'),  # noqa: E501
-        t('tests/fixtures/schema/merge_properties.json sets "wholeListMerge", though the field is not an array of objects, at /properties/array'),  # noqa: E501
-        t('tests/fixtures/schema/merge_properties.json sets both "omitWhenMerged" and "wholeListMerge" at /properties/both'),  # noqa: E501
+        t('tests/fixtures/schema/merge_properties.json sets "omitWhenMerged" to false or null at /properties/omitWhenMergedFalse'),  # noqa: E501: E501
+        t('tests/fixtures/schema/merge_properties.json sets "wholeListMerge" to false or null at /properties/wholeListMergeFalse'),  # noqa: E501: E501
+        t('tests/fixtures/schema/merge_properties.json sets "wholeListMerge", though the field is not an array of objects, at /properties/array'),  # noqa: E501: E501
+        t('tests/fixtures/schema/merge_properties.json sets both "omitWhenMerged" and "wholeListMerge" at /properties/both'),  # noqa: E501: E501
     ]
     assert errors == len(records) == 4
 
@@ -216,9 +216,9 @@ def test_validate_object_id():
                                     allow_optional='/properties/allowOptional')
 
     assert sorted(str(record.message) for record in records) == [
-        t('tests/fixtures/schema/object_id.json is missing "id" in "items/properties" at /definitions/Missing (from /refMissing)'),  # noqa
+        t('tests/fixtures/schema/object_id.json is missing "id" in "items/properties" at /definitions/Missing (from /refMissing)'),  # noqa: E501
         t('tests/fixtures/schema/object_id.json is missing "id" in "items/properties" at /properties/missing'),
-        t('tests/fixtures/schema/object_id.json is missing "id" in "items/required" at /definitions/Optional (from /refOptional)'),  # noqa
+        t('tests/fixtures/schema/object_id.json is missing "id" in "items/required" at /definitions/Optional (from /refOptional)'),  # noqa: E501
         t('tests/fixtures/schema/object_id.json is missing "id" in "items/required" at /properties/optional'),
     ]
     assert errors == len(records) == 4

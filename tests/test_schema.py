@@ -74,7 +74,7 @@ def test_extend_schema():
     }
     metadata = {
         'dependencies': [
-            'https://raw.githubusercontent.com/open-contracting-extensions/ocds_process_title_extension/v1.1.4/extension.json',  # noqa
+            'https://raw.githubusercontent.com/open-contracting-extensions/ocds_process_title_extension/v1.1.4/extension.json',  # noqa: E501
         ]
     }
     codelists = set()
