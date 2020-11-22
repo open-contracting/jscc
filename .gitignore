@@ -1,8 +1,5 @@
-*.swp
-__pycache__
+/*.egg-info
 /.coverage
-/.ve
-/docs/_build
 /dist
+/docs/_build
 /htmlcov
-/jscc.egg-info
