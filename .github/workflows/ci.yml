@@ -22,7 +22,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - run: pip install .[docs,test]
-    - run: pytest --cov jscc --vcr-record=none
+    - run: pytest --cov jscc --vcr-record=none tests
     - env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: coveralls
