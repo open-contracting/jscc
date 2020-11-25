@@ -21,7 +21,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - run: pip install .[docs,test]
+    - run: pip install .[test]
     - run: pytest --cov jscc --vcr-record=none tests
     - env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
