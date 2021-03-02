@@ -17,7 +17,6 @@ setup(
         'json-merge-patch',
         'jsonref',
         'jsonschema',
-        'pytest',
         'requests',
         'rfc3987',
         'strict-rfc3339',
