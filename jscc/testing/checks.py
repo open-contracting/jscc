@@ -1,6 +1,6 @@
 """
-This module offers ``get_*`` methods to check for empty files, misindented JSON files, and invalid JSON files. See
-"pytest examples" for usage examples.
+This module offers ``get_*`` functions to check for empty files, misindented JSON files, and invalid JSON files. See
+"pytest example" in each function's documentation for usage examples.
 
 This module also offers ``validate_*`` methods to test JSON Schema. Each method's behavior is customizable, and not all
 methods are relevant to all schema.
