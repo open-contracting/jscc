@@ -548,7 +548,7 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     """
     Warns and returns the number of errors relating to objects within arrays lacking "id" fields.
 
-    If an array field's "wholeListMerge" property isn't set or is set to ``false`` or ``null`, then the object fields
+    If an array field's "wholeListMerge" property isn't set or is set to ``false`` or ``null``, then the object fields
     under it must have an "id" field, and the "id" field must be required.
 
     :param function allow_missing: a method that accepts a JSON Pointer, and returns whether the field is allowed to
