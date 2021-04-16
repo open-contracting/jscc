@@ -12,7 +12,7 @@ The following packages also support multiple standards:
 * `OCDS Babel <https://ocds-babel.readthedocs.io/en/latest/>`__, which provides Babel extractors and translation methods
 * `OCDS Kit <https://ocdskit.readthedocs.io/en/latest/>`__, which provides `commands <https://ocdskit.readthedocs.io/en/latest/cli/schema.html>`__ for transforming JSON Schema, and methods for `creating a mapping sheet <https://ocdskit.readthedocs.io/en/latest/api/mapping_sheet.html>`__ and for `yielding a schema's fields <https://ocdskit.readthedocs.io/en/latest/api/schema.html>`__.
 
-If you are viewing this on GitHub or PyPi, open the `full documentation <https://jscc.readthedocs.io/>`__ for additional details.
+If you are viewing this on GitHub or PyPI, open the `full documentation <https://jscc.readthedocs.io/>`__ for additional details.
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/jscc.svg
    :target: https://pypi.org/project/jscc/
