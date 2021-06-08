@@ -234,8 +234,8 @@ def validate_schema(path, data, schema):
 
     for error in validator(schema, format_checker=FormatChecker()).iter_errors(data):
         errors += 1
-        warn('{}\n{} ({})\n'.format(json.dumps(error.instance, indent=2), error.message,
-                                    '/'.join(error.absolute_schema_path)), SchemaWarning)
+        warn(f"{json.dumps(error.instance, indent=2)}\n{error.message} ({'/'.join(error.absolute_schema_path)})\n",
+             SchemaWarning)
 
     return errors
 
@@ -262,14 +262,12 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
             for key in data.keys():
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
-                    warn("{}: {}/{} field isn't lowerCamelCase ASCII letters".format(path, pointer, key),
-                         LetterCaseWarning)
+                    warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
         elif parent == 'definitions':
             for key in data.keys():
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
-                    warn("{}: {}/{} block isn't UpperCamelCase ASCII letters".format(path, pointer, key),
-                         LetterCaseWarning)
+                    warn(f"{path}: {pointer}/{key} block isn't UpperCamelCase ASCII letters", LetterCaseWarning)
 
         return errors
 
@@ -309,11 +307,11 @@ def validate_metadata_presence(*args, allow_missing=_false):
                 # If a field has `$ref`, then its `title` and `description` might defer to the reference.
                 if is_missing_property(data, prop) and '$ref' not in data and not allow_missing(pointer):
                     errors += 1
-                    warn('{} is missing "{}" at {}'.format(path, prop, pointer), MetadataPresenceWarning)
+                    warn(f'{path} is missing "{prop}" at {pointer}', MetadataPresenceWarning)
 
             if 'type' not in data and '$ref' not in data and 'oneOf' not in data and not allow_missing(pointer):
                 errors += 1
-                warn('{} is missing "type" or "$ref" or "oneOf" at {}'.format(path, pointer), MetadataPresenceWarning)
+                warn(f'{path} is missing "type" or "$ref" or "oneOf" at {pointer}', MetadataPresenceWarning)
 
         return errors
 
@@ -356,8 +354,7 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
 
     if isinstance(data, list):
         for index, item in enumerate(data):
-            errors += validate_null_type(path, item, pointer='{}/{}'.format(pointer, index), **kwargs,
-                                         no_null=no_null)
+            errors += validate_null_type(path, item, pointer=f'{pointer}/{index}', **kwargs, no_null=no_null)
     elif isinstance(data, dict):
         if 'type' in data and pointer:
             null_in_type = 'null' in data['type']
@@ -365,14 +362,14 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
             # Objects and arrays of objects mustn't be nullable.
             if null_in_type and null_not_allowed and pointer not in allow_object_null:
                 errors += 1
-                warn('{} includes "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
+                warn(f'{path} includes "null" in "type" at {pointer}', NullTypeWarning)
             elif expect_null:
                 if not null_in_type and not null_not_allowed and pointer not in allow_no_null:
                     errors += 1
-                    warn('{} is missing "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
+                    warn(f'{path} is missing "null" in "type" at {pointer}', NullTypeWarning)
             elif null_in_type and pointer not in allow_null:
                 errors += 1
-                warn('{} includes "null" in "type" at {}'.format(path, pointer), NullTypeWarning)
+                warn(f'{path} includes "null" in "type" at {pointer}', NullTypeWarning)
 
         required = data.get('required', [])
 
@@ -380,12 +377,12 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
             if key in ('properties', 'definitions'):
                 for k, v in data[key].items():
                     expect_null = key == 'properties' and k not in required
-                    errors += validate_null_type(path, v, pointer='{}/{}/{}'.format(pointer, key, k), **kwargs,
-                                                 no_null=no_null, expect_null=expect_null)
+                    errors += validate_null_type(path, v, pointer=f'{pointer}/{key}/{k}', **kwargs, no_null=no_null,
+                                                 expect_null=expect_null)
             else:
                 v = data['items'] if key == 'items' else value
-                errors += validate_null_type(path, v, pointer='{}/{}'.format(pointer, key), **kwargs,
-                                             no_null=no_null, expect_null=key != 'items')
+                errors += validate_null_type(path, v, pointer=f'{pointer}/{key}', **kwargs, no_null=no_null,
+                                             expect_null=key != 'items')
 
     return errors
 
@@ -430,12 +427,12 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
             if data['openCodelist']:
                 if ('string' in types and 'enum' in data or 'array' in types and 'enum' in data['items']):
                     errors += 1
-                    warn('{} sets "enum", though "openCodelist" is true, at {}'.format(path, pointer),
+                    warn(f'{path} sets "enum", though "openCodelist" is true, at {pointer}',
                          CodelistEnumWarning)
             else:
                 if 'string' in types and 'enum' not in data or 'array' in types and 'enum' not in data['items']:
                     errors += 1
-                    warn('{} is missing "enum", though "openCodelist" is false, at {}'.format(path, pointer),
+                    warn(f'{path} is missing "enum", though "openCodelist" is false, at {pointer}',
                          CodelistEnumWarning)
 
                     actual = None
@@ -457,20 +454,20 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                                 added, removed = difference(actual, expected)
 
                                 errors += 1
-                                warn("{}: {}/enum doesn't match codelists/{}{}{}".format(
-                                    path, pointer, data['codelist'], added, removed), CodelistEnumWarning)
+                                warn(f"{path}: {pointer}/enum doesn't match codelists/{data['codelist']}"
+                                     f"{added}{removed}", CodelistEnumWarning)
                         break
                 else:
                     # When validating a patched schema, the above code will fail to find the core codelists in an
                     # extension, but that is not an error. This overlaps with `validate_schema_codelists_match`.
                     if not allow_missing(data['codelist']):
                         errors += 1
-                        warn("{} refers to missing file codelists/{} at {}".format(
-                             path, data['codelist'], pointer), CodelistEnumWarning)
+                        warn(f"{path} refers to missing file codelists/{data['codelist']} at {pointer}",
+                             CodelistEnumWarning)
         elif 'enum' in data and parent != 'items' or 'items' in data and 'enum' in data['items']:
             if not allow_enum(pointer):
                 errors += 1
-                warn('{} is missing "codelist" and "openCodelist" at {}'.format(path, pointer), CodelistEnumWarning)
+                warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)
 
         return errors
 
@@ -508,7 +505,7 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
             for _type in get_types(data):
                 if _type not in valid_types and pointer not in allow_invalid:
                     errors += 1
-                    warn('{} includes "{}" in "items/type" at {}'.format(path, _type, pointer), ItemsTypeWarning)
+                    warn(f'{path} includes "{_type}" in "items/type" at {pointer}', ItemsTypeWarning)
 
         return errors
 
@@ -537,7 +534,7 @@ def validate_deep_properties(*args, allow_deep=()):
 
         if pointer and grandparent != 'definitions' and 'properties' in data and pointer not in allow_deep:
             errors += 1
-            warn('{} has "properties" within "properties" at {}'.format(path, pointer), DeepPropertiesWarning)
+            warn(f'{path} has "properties" within "properties" at {pointer}', DeepPropertiesWarning)
 
         return errors
 
@@ -577,16 +574,16 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
             if 'id' not in data['items']['properties']:
                 errors += 1
                 if original == pointer:
-                    warn('{} is missing "id" in "items/properties" at {}'.format(path, pointer), ObjectIdWarning)
+                    warn(f'{path} is missing "id" in "items/properties" at {pointer}', ObjectIdWarning)
                 else:
-                    warn('{} is missing "id" in "items/properties" at {} (from {})'.format(path, original, pointer),
+                    warn(f'{path} is missing "id" in "items/properties" at {original} (from {pointer})',
                          ObjectIdWarning)
             elif 'id' not in required and original not in allow_optional:
                 errors += 1
                 if original == pointer:
-                    warn('{} is missing "id" in "items/required" at {}'.format(path, pointer), ObjectIdWarning)
+                    warn(f'{path} is missing "id" in "items/required" at {pointer}', ObjectIdWarning)
                 else:
-                    warn('{} is missing "id" in "items/required" at {} (from {})'.format(path, original, pointer),
+                    warn(f'{path} is missing "id" in "items/required" at {original} (from {pointer})',
                          ObjectIdWarning)
 
         return errors
@@ -611,19 +608,19 @@ def validate_merge_properties(*args):
 
         if 'omitWhenMerged' in data and not data['omitWhenMerged']:
             errors += 1
-            warn('{} sets "omitWhenMerged" to false or null at {}'.format(path, pointer), MergePropertiesWarning)
+            warn(f'{path} sets "omitWhenMerged" to false or null at {pointer}', MergePropertiesWarning)
         if 'wholeListMerge' in data and not data['wholeListMerge']:
             errors += 1
-            warn('{} sets "wholeListMerge" to false or null at {}'.format(path, pointer), MergePropertiesWarning)
+            warn(f'{path} sets "wholeListMerge" to false or null at {pointer}', MergePropertiesWarning)
         elif 'wholeListMerge' in data:
             if not is_array_of_objects(data):
                 errors += 1
-                warn('{} sets "wholeListMerge", though the field is not an array of objects, at {}'.format(
-                    path, pointer), MergePropertiesWarning)
+                warn(f'{path} sets "wholeListMerge", though the field is not an array of objects, at {pointer}',
+                     MergePropertiesWarning)
             if 'omitWhenMerged' in data:
                 errors += 1
-                warn('{} sets both "omitWhenMerged" and "wholeListMerge" at {}'.format(
-                    path, pointer), MergePropertiesWarning)
+                warn(f'{path} sets both "omitWhenMerged" and "wholeListMerge" at {pointer}',
+                     MergePropertiesWarning)
 
         return errors
 
@@ -645,7 +642,7 @@ def validate_ref(path, data):
         # `repr` causes the references to be loaded, if possible.
         repr(ref)
     except JsonRefError as e:
-        warn('{} has {} at {}'.format(path, e.message, '/'.join(map(str, e.path))), RefWarning)
+        warn(f"{path} has {e.message} at {'/'.join(map(str, e.path))}", RefWarning)
         return 1
 
     return 0
@@ -679,13 +676,13 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
 
         if isinstance(data, list):
             for index, item in enumerate(data):
-                codelists.update(collect_codelist_values(path, item, pointer='{}/{}'.format(pointer, index)))
+                codelists.update(collect_codelist_values(path, item, pointer=f'{pointer}/{index}'))
         elif isinstance(data, dict):
             if 'codelist' in data:
                 codelists.add(data['codelist'])
 
             for key, value in data.items():
-                codelists.update(collect_codelist_values(path, value, pointer='{}/{}'.format(pointer, key)))
+                codelists.update(collect_codelist_values(path, value, pointer=f'{pointer}/{key}'))
 
         return codelists
 
@@ -699,7 +696,7 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
             if csvname.startswith(('+', '-')):
                 if csvname[1:] not in external_codelists:
                     errors += 1
-                    warn('{} patches unknown codelist'.format(csvname), SchemaCodelistsMatchWarning)
+                    warn(f'{csvname} patches unknown codelist', SchemaCodelistsMatchWarning)
             else:
                 codelist_files.add(csvname)
 
@@ -714,12 +711,10 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
 
     if unused_codelists:
         errors += 1
-        warn('unused codelists: {}'.format(', '.join(sorted(unused_codelists))),
-             SchemaCodelistsMatchWarning)
+        warn(f"unused codelists: {', '.join(sorted(unused_codelists))}", SchemaCodelistsMatchWarning)
     if missing_codelists:
         errors += 1
-        warn('missing codelists: {}'.format(', '.join(sorted(missing_codelists))),
-             SchemaCodelistsMatchWarning)
+        warn(f"missing codelists: {', '.join(sorted(missing_codelists))}", SchemaCodelistsMatchWarning)
 
     return errors
 
@@ -733,12 +728,12 @@ def _traverse(block):
 
         if isinstance(data, list):
             for index, item in enumerate(data):
-                errors += method(path, item, pointer='{}/{}'.format(pointer, index))
+                errors += method(path, item, pointer=f'{pointer}/{index}')
         elif isinstance(data, dict):
             errors += block(path, data, pointer)
 
             for key, value in data.items():
-                errors += method(path, value, pointer='{}/{}'.format(pointer, key))
+                errors += method(path, value, pointer=f'{pointer}/{key}')
 
         return errors
 

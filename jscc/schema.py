@@ -89,7 +89,7 @@ def extend_schema(basename, schema, metadata, codelists=None):
     def recurse(metadata):
         urls = metadata.get('dependencies', []) + metadata.get('testDependencies', [])
         for metadata_url in urls:
-            patch_url = '{}/{}'.format(metadata_url.rsplit('/', 1)[0], basename)
+            patch_url = f"{metadata_url.rsplit('/', 1)[0]}/{basename}"
             metadata = http_get(metadata_url).json()
             patch = http_get(patch_url).json()
             if codelists is not None:

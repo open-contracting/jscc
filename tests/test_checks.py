@@ -25,11 +25,11 @@ def chdir(path):
 
 def t(message):
     path, rest = message.split(' ', 1)
-    return '{} {}'.format(path.replace('/', os.sep), rest)
+    return f"{path.replace('/', os.sep)} {rest}"
 
 
 def validate(name, *args, **kwargs):
-    filepath = os.path.join('schema', '{}.json'.format(name))
+    filepath = os.path.join('schema', f'{name}.json')
     return getattr(jscc.testing.checks, 'validate_' + name)(path(filepath), parse(filepath), *args, **kwargs)
 
 

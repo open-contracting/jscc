@@ -49,13 +49,13 @@ def difference(actual, expected):
     """
     added = actual - expected
     if added:
-        added = '; added {}'.format(added)
+        added = f'; added {added}'
     else:
         added = ''
 
     removed = expected - actual
     if removed:
-        removed = '; removed {}'.format(removed)
+        removed = f'; removed {removed}'
     else:
         removed = ''
 
