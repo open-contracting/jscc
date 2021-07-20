@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.0.6 (2021-07-19)
+------------------
+
+Fixed
+~~~~~
+
+-  :meth:`jscc.testing.checks.validate_object_id` supports the ``omitWhenMerged`` property.
+
 0.0.5 (2021-04-10)
 ------------------
 
