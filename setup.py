@@ -19,8 +19,8 @@ setup(
         'jsonref',
         'jsonschema',
         'requests',
+        'rfc3339-validator',
         'rfc3987',
-        'strict-rfc3339',
     ],
     extras_require={
         'test': [
