@@ -103,7 +103,7 @@ def _false(*args):
     return False
 
 
-def get_empty_files(include=_true):
+def get_empty_files(include=_true, **kwargs):
     """
     Yields the path (as a tuple) of any file that is empty.
 
@@ -123,7 +123,7 @@ def get_empty_files(include=_true):
                             'Files are empty. See warnings below.')
 
     """
-    for path, name in walk():
+    for path, name in walk(**kwargs):
         if tracked(path) and include(path, name) and name != '__init__.py':
             try:
                 with open(path) as f:
@@ -142,7 +142,7 @@ def get_empty_files(include=_true):
                 yield path,
 
 
-def get_misindented_files(include=_true):
+def get_misindented_files(include=_true, **kwargs):
     """
     Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
 
@@ -161,14 +161,14 @@ def get_misindented_files(include=_true):
             warn_and_assert(get_misindented_files(), '{0} is not indented as expected, run: ocdskit indent {0}',
                             'Files are not indented as expected. See warnings below, or run: ocdskit indent -r .')
     """
-    for path, name, text, data in walk_json_data():
+    for path, name, text, data in walk_json_data(**kwargs):
         if tracked(path) and include(path, name):
             expected = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
             if text != expected:
                 yield path,
 
 
-def get_invalid_json_files():
+def get_invalid_json_files(**kwargs):
     """
     Yields the path and exception (as a tuple) of any JSON file that isn't valid.
 
@@ -185,7 +185,7 @@ def get_invalid_json_files():
             warn_and_assert(get_invalid_json_files(), '{0} is not valid JSON: {1}',
                             'JSON files are invalid. See warnings below.')
     """
-    for path, name in walk():
+    for path, name in walk(**kwargs):
         if path.endswith('.json'):
             with open(path) as f:
                 text = f.read()
@@ -196,7 +196,7 @@ def get_invalid_json_files():
                         yield path, e
 
 
-def get_invalid_csv_files():
+def get_invalid_csv_files(**kwargs):
     """
     Yields the path and exception (as a tuple) of any CSV file that isn't valid.
 
@@ -211,7 +211,7 @@ def get_invalid_csv_files():
             warn_and_assert(get_invalid_csv_files(), '{0} is not valid CSV: {1}',
                             'CSV files are invalid. See warnings below.')
     """
-    for path, name in walk():
+    for path, name in walk(**kwargs):
         if path.endswith('.csv'):
             with open(path, newline='') as f:
                 try:

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.0.7 (2021-11-04)
+------------------
+
+Changed
+~~~~~~~
+
+-  ``jscc.testing.checks``: :meth:`~jscc.testing.checks.get_empty_files`, :meth:`~jscc.testing.checks.get_misindented_files`, :meth:`~jscc.testing.checks.get_invalid_json_files` and :meth:`~jscc.testing.checks.get_invalid_csv_files` accept keyword arguments to pass to :meth:`jscc.testing.filesystem.walk` and :meth:`jscc.testing.filesystem.walk_json_data`.
+
 0.0.6 (2021-07-19)
 ------------------
 
