@@ -1,4 +1,4 @@
-|PyPI Version| |Build Status| |Lint Status| |Coverage Status| |Python Version|
+|PyPI Version| |Build Status| |Coverage Status| |Python Version|
 
 This Python package provides methods for testing standards that use JSON Schema and CSV codelists with `custom JSON Schema properties <https://os4d.opendataservices.coop/development/schema/#extended-json-schema>`__, like:
 
@@ -17,7 +17,6 @@ If you are viewing this on GitHub or PyPI, open the `full documentation <https:/
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/jscc.svg
    :target: https://pypi.org/project/jscc/
 .. |Build Status| image:: https://github.com/open-contracting/jscc/workflows/CI/badge.svg
-.. |Lint Status| image:: https://github.com/open-contracting/jscc/workflows/Lint/badge.svg
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/jscc/badge.svg?branch=main
    :target: https://coveralls.io/github/open-contracting/jscc?branch=main
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/jscc.svg
