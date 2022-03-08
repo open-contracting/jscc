@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "pass": {
+      "type": "array",
+      "items": {}
+    },
+    "fail": {
+      "type": "array"
+    },
+    "allow": {
+      "type": "array"
+    }
+  }
+}
