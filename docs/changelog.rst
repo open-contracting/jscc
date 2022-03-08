@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.0.8 (2022-03-08)
+------------------
+
+Added
+~~~~~
+
+-  :meth:`jscc.testing.checks.validate_array_items` warns if a field whose ``type`` property includes "array" is missing the ``items`` property.
+
 0.0.7 (2021-11-04)
 ------------------
 
