@@ -128,6 +128,16 @@ def test_validate_deep_properties():
     assert errors == len(records) == 1
 
 
+def test_validate_array_items():
+    with pytest.warns(UserWarning) as records:
+        errors = validate('array_items', allow_invalid={'/properties/allow'})
+
+    assert sorted(str(record.message) for record in records) == [
+        t('tests/fixtures/schema/array_items.json is missing "items" at /properties/fail'),
+    ]
+    assert errors == len(records) == 1
+
+
 def test_validate_items_type():
     with pytest.warns(UserWarning) as records:
         errors = validate('items_type', additional_valid_types=['boolean'],

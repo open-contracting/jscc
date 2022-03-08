@@ -26,14 +26,16 @@ method that uses the ``validate_*`` methods. For example:
 .. code-block:: python
 
    from jsonref import JsonRef
-   from jscc.schema import (validate_codelist_enum, validate_deep_properties, validate_items_type,
-                            validate_letter_case, validate_merge_properties, validate_metadata_presence,
-                            validate_null_type, validate_object_id, validate_ref, validate_schema)
+   from jscc.schema import (validate_array_items, validate_codelist_enum, validate_deep_properties,
+                            validate_items_type, validate_letter_case, validate_merge_properties,
+                            validate_metadata_presence, validate_null_type, validate_object_id, validate_ref,
+                            validate_schema)
 
    def validate_json_schema(path, name, data, schema):
        errors = 0
 
        errors += validate_schema(path, data, schema)
+       errors += validate_array_items(path, data)
        errors += validate_items_type(path, data)
        errors += validate_codelist_enum(path, data)
        errors += validate_letter_case(path, data)
@@ -468,6 +470,29 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
             if not allow_enum(pointer):
                 errors += 1
                 warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)
+
+        return errors
+
+    return _traverse(block)(*args)
+
+
+def validate_array_items(*args, allow_invalid=()):
+    """
+    Warns and returns the number of errors relating to array fields without an "items" property.
+
+    A field whose "type" property includes "array" must set the "items" property.
+
+    :param allow_invalid: JSON Pointers of fields whose "items" properties are allowed to be missing
+    :type allow_invalid: list, tuple or set
+    :returns: the number of errors
+    :rtype: int
+    """
+    def block(path, data, pointer):
+        errors = 0
+
+        if 'type' in data and 'array' in data['type'] and 'items' not in data and pointer not in allow_invalid:
+            errors += 1
+            warn(f'{path} is missing "items" at {pointer}', DeepPropertiesWarning)
 
         return errors
 
