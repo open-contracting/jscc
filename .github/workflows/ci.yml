@@ -16,7 +16,7 @@ jobs:
           cache: pip
           cache-dependency-path: setup.py
       - run: pip install .[test]
-      - run: pytest -W error --cov jscc --vcr-record=none tests
+      - run: pytest -W error --cov jscc --vcr-record=none
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: coveralls --service=github
