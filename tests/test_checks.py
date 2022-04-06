@@ -243,6 +243,8 @@ def test_validate_ref_pass():
 
         errors = validate_ref(path(filepath), parse(filepath))
 
+    assert errors == 0
+
 
 def test_validate_ref_fail():
     with pytest.warns(UserWarning) as records:
