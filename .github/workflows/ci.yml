@@ -22,7 +22,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - run: pip install .[test]
-      - run: pytest --cov jscc --vcr-record=none tests
+      - env:
+          PYTHONWARNINGS: error
+        run: pytest --cov jscc --vcr-record=none tests
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: coveralls --service=github

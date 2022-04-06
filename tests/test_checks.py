@@ -1,6 +1,7 @@
 import contextlib
 import json
 import os
+import warnings
 
 import pytest
 from jsonref import JsonRef
@@ -236,10 +237,11 @@ def test_validate_object_id():
 
 def test_validate_ref_pass():
     filepath = os.path.join('schema', 'schema.json')
-    with pytest.warns(None) as records:
-        errors = validate_ref(path(filepath), parse(filepath))
 
-    assert errors == len(records) == 0
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+
+        errors = validate_ref(path(filepath), parse(filepath))
 
 
 def test_validate_ref_fail():
