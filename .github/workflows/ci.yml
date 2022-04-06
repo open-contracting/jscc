@@ -23,7 +23,7 @@ jobs:
             ${{ runner.os }}-pip-
       - run: pip install .[test]
       # pytest-vcr uses pyyaml, which warns on pypy-3.7 https://github.com/yaml/pyyaml/issues/534
-      - run: pytest -W error -W ignore::ImportWarning --cov jscc --vcr-record=none tests
+      - run: pytest -W error --cov jscc --vcr-record=none tests
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: coveralls --service=github
