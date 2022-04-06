@@ -239,7 +239,7 @@ def test_validate_ref_pass():
     filepath = os.path.join('schema', 'schema.json')
 
     with warnings.catch_warnings():
-        warnings.simplefilter('error')
+        warnings.simplefilter('error')  # no warnings
 
         errors = validate_ref(path(filepath), parse(filepath))
 
