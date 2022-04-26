@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='jscc',
-    version='0.0.8',
+    version='0.0.9',
     author='Open Contracting Partnership and Open Data Services Co-operative Limited',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/jscc',
@@ -20,7 +20,7 @@ setup(
         'jsonschema',
         'requests',
         'rfc3339-validator',
-        'rfc3987',
+        'rfc3986-validator',
     ],
     extras_require={
         'test': [

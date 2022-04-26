@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.0.9 (2022-04-26)
+------------------
+
+Changed
+~~~~~~~
+
+-  Changed dependency from `rfc3987 <https://pypi.org/project/rfc3987/>`__ (GPL) to `rfc3986-validator <https://pypi.org/project/rfc3986-validator/>`__ (MIT).
+
 0.0.8 (2022-03-08)
 ------------------
 
