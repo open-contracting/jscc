@@ -251,7 +251,7 @@ def test_validate_ref_fail():
         errors = validate('ref')
 
     assert sorted(str(record.message) for record in records) == [
-        t("tests/fixtures/schema/ref.json has Unresolvable JSON pointer: '/definitions/Fail' at properties/fail"),
+        t("tests/fixtures/schema/ref.json has Error while resolving `#/definitions/Fail`: Unresolvable JSON pointer: '/definitions/Fail' at properties/fail"),  # noqa: E501
     ]
     assert errors == len(records) == 1
 
