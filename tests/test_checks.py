@@ -3,8 +3,8 @@ import json
 import os
 import warnings
 
+import jsonref
 import pytest
-from jsonref import JsonRef
 
 import jscc.testing.checks
 from jscc.exceptions import DuplicateKeyError
@@ -223,7 +223,7 @@ def test_validate_object_id():
 
     filepath = os.path.join('schema', 'object_id.json')
     with pytest.warns(UserWarning) as records:
-        errors = validate_object_id(path(filepath), JsonRef.replace_refs(parse(filepath)), allow_missing=allow_missing,
+        errors = validate_object_id(path(filepath), jsonref.replace_refs(parse(filepath)), allow_missing=allow_missing,
                                     allow_optional='/properties/allowOptional')
 
     assert sorted(str(record.message) for record in records) == [

@@ -25,7 +25,7 @@ method that uses the ``validate_*`` methods. For example:
 
 .. code-block:: python
 
-   from jsonref import JsonRef
+   import jsonref
    from jscc.schema import (validate_array_items, validate_codelist_enum, validate_deep_properties,
                             validate_items_type, validate_letter_case, validate_merge_properties,
                             validate_metadata_presence, validate_null_type, validate_object_id, validate_ref,
@@ -42,7 +42,7 @@ method that uses the ``validate_*`` methods. For example:
        errors += validate_merge_properties(path, data)
        errors += validate_ref(path, data)
        errors += validate_metadata_presence(path, data)
-       errors += validate_object_id(path, JsonRef.replace_refs(data))
+       errors += validate_object_id(path, jsonref.replace_refs(data))
        errors += validate_null_type(path, data)
        # Here, we don't add to `errors`, in order to not count these warnings as errors.
        validate_deep_properties(path, data)
@@ -79,7 +79,7 @@ import os
 import re
 from warnings import warn
 
-from jsonref import JsonRef, JsonRefError
+import jsonref
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator as validator
 
@@ -661,12 +661,9 @@ def validate_ref(path, data):
     :returns: ``0`` or ``1``
     :rtype: int
     """
-    ref = JsonRef.replace_refs(data)
-
     try:
-        # `repr` causes the references to be loaded, if possible.
-        repr(ref)
-    except JsonRefError as e:
+        jsonref.replace_refs(data, lazy_load=False)
+    except jsonref.JsonRefError as e:
         warn(f"{path} has {e.message} at {'/'.join(map(str, e.path))}", RefWarning)
         return 1
 

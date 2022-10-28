@@ -16,7 +16,7 @@ setup(
     long_description_content_type='text/x-rst',
     install_requires=[
         'json-merge-patch',
-        'jsonref',
+        'jsonref>=1',
         'jsonschema',
         'requests',
         'rfc3339-validator',
