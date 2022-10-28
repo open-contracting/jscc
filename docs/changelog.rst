@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.1.0 (2022-10-28)
+------------------
+
+Changed
+~~~~~~~
+
+-  Update to `jsonref <https://jsonref.readthedocs.io/>`__ 1.0's API.
+
 0.0.9 (2022-04-26)
 ------------------
 
