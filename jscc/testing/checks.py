@@ -148,7 +148,7 @@ def get_misindented_files(include=_true, **kwargs):
     """
     Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
 
-    JSON files must be indented with two spaces, musn't escape non-ASCII characters (no ``\\uXXXX`` sequences), and
+    JSON files must be indented with two spaces, mustn't escape non-ASCII characters (no ``\\uXXXX`` sequences), and
     must have a newline at end of file.
 
     :param function include: a method that accepts a file path and file name, and returns whether to test the file
@@ -620,7 +620,7 @@ def validate_merge_properties(*args):
     """
     Warns and returns the number of errors relating to missing or extra merge properties.
 
-    The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and musn't be set to ``false`` or
+    The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and mustn't be set to ``false`` or
     ``null``. The "wholeListMerge" property must be set on non-nullable arrays of objects only.
 
     See https://standard.open-contracting.org/1.1/en/schema/merging/#whole-list-merge
