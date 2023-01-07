@@ -448,7 +448,7 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                     # The codelist's CSV file must exist.
                     if csvname == data['codelist']:
                         if actual:
-                            expected = set([row['Code'] for row in rows])
+                            expected = {row['Code'] for row in rows}
                             if 'string' in types and 'null' in types:
                                 expected.add(None)
 

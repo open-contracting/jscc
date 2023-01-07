@@ -70,7 +70,7 @@ def walk_csv_data(**kwargs):
                 reader = csv.DictReader(StringIO(text))
                 try:
                     fieldnames = reader.fieldnames
-                    rows = [row for row in reader]
+                    rows = list(reader)
                     yield (path, name, text, fieldnames, rows)
                 except csv.Error:
                     continue
