@@ -48,6 +48,7 @@ def test_get_empty_files():
             'empty-object.json',
             'empty-string.json',
             'null.json',
+            'whitespace.json',
             'whitespace.txt',
         }
 

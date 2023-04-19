@@ -133,15 +133,15 @@ def get_empty_files(include=_true, **kwargs):
             except UnicodeDecodeError:
                 continue  # the file is non-empty, and might be binary
 
-            if name.endswith('.json'):
+            if not text.strip():
+                yield path,
+            elif name.endswith('.json'):
                 try:
                     value = json.loads(text)
                     if not value and not isinstance(value, (bool, int, float)):
                         yield path,
                 except json.decoder.JSONDecodeError:
                     continue  # the file is non-empty
-            elif not text.strip():
-                yield path,
 
 
 def get_misindented_files(include=_true, **kwargs):

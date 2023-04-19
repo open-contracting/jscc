@@ -9,6 +9,11 @@ Changed
 
 -  Drop support for Python 3.6 (end-of-life 2021-12-23).
 
+Fixed
+~~~~~
+
+-  :meth:`jscc.testing.checks.get_empty_files` correctly returns JSON files that are whitespace only.
+
 0.1.0 (2022-10-28)
 ------------------
 
