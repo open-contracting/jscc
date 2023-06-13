@@ -49,7 +49,7 @@ method that uses the ``validate_*`` methods. For example:
 
        assert not errors, 'One or more JSON Schema files are invalid. See warnings below.'
 
-You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the warning messages:
+You can monkeypatch ``warnings.showwarning`` to customize and abbreviate the warning messages:
 
 .. code-block:: python
 
@@ -59,14 +59,14 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
 
    cwd = os.getcwd()
 
-   def formatwarning(message, category, filename, lineno, line=None):
+   def showwarning(message, category, filename, lineno, file=None, line=None):
        # Prefix warnings that count as errors with "ERROR: ".
        if category != DeepPropertiesWarning:
            message = 'ERROR: ' + message
        # Remove the path to the current working directory.
        return str(message).replace(cwd + os.sep, '')
 
-   warnings.formatwarning = formatwarning
+   warnings.showwarning = showwarning
 """
 
 # In this module, it would be simpler to use a tuple for each `pointer` keyword argument, especially when calculating
