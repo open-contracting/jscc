@@ -17,7 +17,7 @@ Changed
 
 -  :meth:`~jscc.testing.checks.validate_schema` accepts a ``validator`` argument, instead of using JSON Schema Draft 4.
 
-   To preserve the same behavior as before, install ``jsonschema``, ``rfc3339-validator`` and ``rfc3986-validator``, and change:
+   To preserve behavior, install ``jsonschema``, ``rfc3339-validator`` and ``rfc3986-validator``, and change:
 
    .. code-block:: python
 
