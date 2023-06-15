@@ -26,10 +26,10 @@ method that uses the ``validate_*`` methods. For example:
 .. code-block:: python
 
    import jsonref
-   from jscc.schema import (validate_array_items, validate_codelist_enum, validate_deep_properties,
-                            validate_items_type, validate_letter_case, validate_merge_properties,
-                            validate_metadata_presence, validate_null_type, validate_object_id, validate_ref,
-                            validate_schema)
+   from jscc.testing.checks import (validate_array_items, validate_codelist_enum, validate_deep_properties,
+                                    validate_items_type, validate_letter_case, validate_merge_properties,
+                                    validate_metadata_presence, validate_null_type, validate_object_id, validate_ref,
+                                    validate_schema)
 
    def validate_json_schema(path, name, data, schema):
        errors = 0
