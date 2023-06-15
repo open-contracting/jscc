@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.2 (2023-06-14)
+------------------
+
+Removed
+~~~~~~~
+
+-  :meth:`~jscc.testing.checks.get_invalid_csv_files`, as Python's CSV parser errors only if the CSV dialect is configured.
+
 0.2.1 (2023-06-14)
 ------------------
 
@@ -129,7 +137,6 @@ Added
 ~~~~~
 
 -  :meth:`jscc.schema.extend_schema`
--  :meth:`jscc.testing.checks.get_invalid_csv_files`
 
 Changed
 ~~~~~~~

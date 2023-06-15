@@ -210,30 +210,6 @@ def get_invalid_json_files(**kwargs):
                         yield path, e
 
 
-def get_invalid_csv_files(**kwargs):
-    """
-    Yields the path and exception (as a tuple) of any CSV file that isn't valid.
-
-    CSV files must be parsed without error by the ``csv`` module.
-
-    pytest example::
-
-        from jscc.testing.checks import get_invalid_csv_files
-        from jscc.testing.util import warn_and_assert
-
-        def test_invalid_csv():
-            warn_and_assert(get_invalid_csv_files(), '{0} is not valid CSV: {1}',
-                            'CSV files are invalid. See warnings below.')
-    """
-    for path, name in walk(**kwargs):
-        if path.endswith('.csv'):
-            with open(path, newline='') as f:
-                try:
-                    csv.DictReader(f)
-                except csv.Error as e:
-                    yield path, e
-
-
 def validate_schema(path, data, validator):
     """
     Warns and returns the number of errors relating to JSON Schema validation.
