@@ -87,7 +87,6 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
 # the last component of the pointer (the "parent"). However, it's easier when *using* the module to write JSON Pointers
 # as strings. Therefore, we use strings instead of tuples.
 
-import csv
 import json
 import os
 import re
