@@ -260,9 +260,9 @@ def test_validate_ref_fail():
 
 
 def test_validate_schema():
-    validator = Draft4Validator(Draft4Validator.META_SCHEMA, format_checker=FormatChecker())
+    validator = Draft4Validator(parse('meta-schema.json'), format_checker=FormatChecker())
     with pytest.warns(UserWarning) as records:
-        errors = validate('schema', parse('meta-schema.json'), validator)
+        errors = validate('schema', validator)
 
     assert [str(record.message) for record in records] == [
         "[]\n[] is not of type 'object' (properties/properties/type)\n",

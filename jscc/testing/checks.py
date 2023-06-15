@@ -48,7 +48,7 @@ method that uses the ``validate_*`` methods. For example:
    def validate_json_schema(path, name, data, schema):
        errors = 0
 
-       errors += validate_schema(path, data, schema, validator)
+       errors += validate_schema(path, data, validator)
        errors += validate_array_items(path, data)
        errors += validate_items_type(path, data)
        errors += validate_codelist_enum(path, data)
@@ -234,13 +234,12 @@ def get_invalid_csv_files(**kwargs):
                     yield path, e
 
 
-def validate_schema(path, data, schema, validator):
+def validate_schema(path, data, validator):
     """
     Warns and returns the number of errors relating to JSON Schema validation.
 
     Uses the `jsonschema <https://python-jsonschema.readthedocs.io/>`__ module.
 
-    :param object schema: the metaschema against which to validate
     :param validator: The validator to use
     :returns: the number of errors
     :rtype: int
