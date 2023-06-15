@@ -1,6 +1,31 @@
 Changelog
 =========
 
+0.2.0 (2023-06-14)
+------------------
+
+Changed
+~~~~~~~
+
+-  :meth:`~jscc.testing.checks.validate_schema` accepts a ``validator`` argument, instead of using JSON Schema Draft 4. To preserve the same behavior as before, change:
+
+   .. code-block:: python
+
+      validate_schema(path, data, schema)
+
+   to:
+
+   .. code-block:: python
+
+      from jsonschema import FormatChecker
+      from jsonschema.validators import Draft4Validator
+
+      # Declare this at the module level, to minimize initializations.
+      validator = Draft4Validator(Draft4Validator.META_SCHEMA, format_checker=FormatChecker())
+
+      # Meanwhile, elsewhere...
+      validate_schema(path, data, schema, validator)
+
 0.1.1 (2023-04-19)
 ------------------
 

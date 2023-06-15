@@ -26,15 +26,29 @@ method that uses the ``validate_*`` methods. For example:
 .. code-block:: python
 
    import jsonref
-   from jscc.testing.checks import (validate_array_items, validate_codelist_enum, validate_deep_properties,
-                                    validate_items_type, validate_letter_case, validate_merge_properties,
-                                    validate_metadata_presence, validate_null_type, validate_object_id, validate_ref,
-                                    validate_schema)
+   from jscc.testing.checks import (
+       validate_array_items,
+       validate_codelist_enum,
+       validate_deep_properties,
+       validate_items_type,
+       validate_letter_case,
+       validate_merge_properties,
+       validate_metadata_presence,
+       validate_null_type,
+       validate_object_id,
+       validate_ref,
+       validate_schema,
+   )
+   from jsonschema import FormatChecker
+   from jsonschema.validators import Draft4Validator
+
+   validator = Draft4Validator(Draft4Validator.META_SCHEMA, format_checker=FormatChecker())
+
 
    def validate_json_schema(path, name, data, schema):
        errors = 0
 
-       errors += validate_schema(path, data, schema)
+       errors += validate_schema(path, data, schema, validator)
        errors += validate_array_items(path, data)
        errors += validate_items_type(path, data)
        errors += validate_codelist_enum(path, data)
@@ -47,7 +61,7 @@ method that uses the ``validate_*`` methods. For example:
        # Here, we don't add to `errors`, in order to not count these warnings as errors.
        validate_deep_properties(path, data)
 
-       assert not errors, 'One or more JSON Schema files are invalid. See warnings below.'
+       assert not errors, "One or more JSON Schema files are invalid. See warnings below."
 
 You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the warning messages:
 
@@ -80,8 +94,6 @@ import re
 from warnings import warn
 
 import jsonref
-from jsonschema import FormatChecker
-from jsonschema.validators import Draft4Validator as validator
 
 from jscc.exceptions import (CodelistEnumWarning, DeepPropertiesWarning, DuplicateKeyError, ItemsTypeWarning,
                              LetterCaseWarning, MergePropertiesWarning, MetadataPresenceWarning, NullTypeWarning,
@@ -222,19 +234,20 @@ def get_invalid_csv_files(**kwargs):
                     yield path, e
 
 
-def validate_schema(path, data, schema):
+def validate_schema(path, data, schema, validator):
     """
     Warns and returns the number of errors relating to JSON Schema validation.
 
     Uses the `jsonschema <https://python-jsonschema.readthedocs.io/>`__ module.
 
     :param object schema: the metaschema against which to validate
+    :param validator: The validator to use
     :returns: the number of errors
     :rtype: int
     """
     errors = 0
 
-    for error in validator(schema, format_checker=FormatChecker()).iter_errors(data):
+    for error in validator.iter_errors(data):
         errors += 1
         warn(f"{json.dumps(error.instance, indent=2)}\n{error.message} ({'/'.join(error.absolute_schema_path)})\n",
              SchemaWarning)

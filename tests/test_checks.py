@@ -5,6 +5,8 @@ import warnings
 
 import jsonref
 import pytest
+from jsonschema import FormatChecker
+from jsonschema.validators import Draft4Validator
 
 import jscc.testing.checks
 from jscc.exceptions import DuplicateKeyError
@@ -258,8 +260,9 @@ def test_validate_ref_fail():
 
 
 def test_validate_schema():
+    validator = Draft4Validator(Draft4Validator.META_SCHEMA, format_checker=FormatChecker())
     with pytest.warns(UserWarning) as records:
-        errors = validate('schema', parse('meta-schema.json'))
+        errors = validate('schema', parse('meta-schema.json'), validator)
 
     assert [str(record.message) for record in records] == [
         "[]\n[] is not of type 'object' (properties/properties/type)\n",
