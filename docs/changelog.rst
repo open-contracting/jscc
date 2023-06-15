@@ -30,10 +30,8 @@ Changed
       from jsonschema import FormatChecker
       from jsonschema.validators import Draft4Validator
 
-      # Declare this at the module level, to minimize initializations.
       validator = Draft4Validator(schema, format_checker=FormatChecker())
 
-      # Meanwhile, elsewhere...
       validate_schema(path, data, validator)
 
 0.1.1 (2023-04-19)
