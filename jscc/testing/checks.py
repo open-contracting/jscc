@@ -544,7 +544,12 @@ def validate_deep_properties(*args, allow_deep=()):
         else:
             grandparent = None
 
-        if pointer and grandparent not in ['definitions', '$defs'] and 'properties' in data and pointer not in allow_deep:
+        if (
+          pointer and
+          grandparent not in ['definitions', '$defs'] and
+          'properties' in data and
+          pointer not in allow_deep
+          ):
             errors += 1
             warn(f'{path} has "properties" within "properties" at {pointer}', DeepPropertiesWarning)
 
