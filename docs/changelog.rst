@@ -8,12 +8,13 @@ Changed
 ~~~~~~~
 
 - Add support for `$defs` keyword in:
-  -  :meth:`~jscc.testing.checks.validate_letter_case`
-  -  :meth:`~jscc.testing.checks.validate_metadata_presence`
-  -  :meth:`~jscc.testing.checks.validate_null_types`
-  -  :meth:`~jscc.testing.checks.validate_deep_properties`
-  -  :meth:`~jscc.schema.is_json_schema`
-  -  :meth:`~jscc.schema.is_json_merge_patch`
+
+  -  :meth:`jscc.testing.checks.validate_letter_case`
+  -  :meth:`jscc.testing.checks.validate_metadata_presence`
+  -  :meth:`jscc.testing.checks.validate_null_types`
+  -  :meth:`jscc.testing.checks.validate_deep_properties`
+  -  :meth:`jscc.schema.is_json_schema`
+  -  :meth:`jscc.schema.is_json_merge_patch`
 
 0.2.2 (2023-06-14)
 ------------------

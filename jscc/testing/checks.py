@@ -252,7 +252,7 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
-        elif parent in ['definitions', '$defs']:
+        elif parent in ('definitions', '$defs'):
             for key in data.keys():
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
@@ -545,11 +545,11 @@ def validate_deep_properties(*args, allow_deep=()):
             grandparent = None
 
         if (
-          pointer and
-          grandparent not in ['definitions', '$defs'] and
-          'properties' in data and
-          pointer not in allow_deep
-          ):
+            pointer
+            and grandparent not in ('definitions', '$defs')
+            and 'properties' in data
+            and pointer not in allow_deep
+        ):
             errors += 1
             warn(f'{path} has "properties" within "properties" at {pointer}', DeepPropertiesWarning)
 
