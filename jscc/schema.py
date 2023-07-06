@@ -26,7 +26,7 @@ def is_json_schema(data):
     :returns: whether the JSON data is a JSON Schema
     :rtype: bool
     """
-    return '$schema' in data or 'definitions' in data or 'properties' in data
+    return '$schema' in data or 'definitions' in data or '$defs' in data or 'properties' in data
 
 
 def is_json_merge_patch(data):
@@ -35,7 +35,7 @@ def is_json_merge_patch(data):
     :returns: whether the JSON data is a JSON Merge Patch
     :rtype: bool
     """
-    return '$schema' not in data and ('definitions' in data or 'properties' in data)
+    return '$schema' not in data and ('definitions' in data or '$defs' in data or 'properties' in data)
 
 
 def is_array_of_objects(field):

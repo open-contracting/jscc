@@ -252,7 +252,7 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
-        elif parent == 'definitions':
+        elif parent in ('definitions', '$defs'):
             for key in data.keys():
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
@@ -276,7 +276,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
     :returns: the number of errors
     :rtype: int
     """  # noqa: E501
-    schema_fields = {'definitions', 'deprecated', 'items', 'patternProperties', 'properties'}
+    schema_fields = {'definitions', '$defs', 'deprecated', 'items', 'patternProperties', 'properties'}
     schema_sections = {'patternProperties'}
     required_properties = {'title', 'description'}
 
@@ -363,7 +363,7 @@ def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, 
         required = data.get('required', [])
 
         for key, value in data.items():
-            if key in ('properties', 'definitions'):
+            if key in ('properties', 'definitions', '$defs'):
                 for k, v in data[key].items():
                     expect_null = key == 'properties' and k not in required
                     errors += validate_null_type(path, v, pointer=f'{pointer}/{key}/{k}', **kwargs, no_null=no_null,
@@ -528,7 +528,7 @@ def validate_deep_properties(*args, allow_deep=()):
     """
     Warns and returns the number of errors relating to deep objects.
 
-    The schema must use "definitions" instead of nesting "properties".
+    The schema must use "definitions" or "$defs" instead of nesting "properties".
 
     :param allow_deep: JSON Pointers of fields to ignore
     :type allow_deep: list, tuple or set
@@ -544,7 +544,12 @@ def validate_deep_properties(*args, allow_deep=()):
         else:
             grandparent = None
 
-        if pointer and grandparent != 'definitions' and 'properties' in data and pointer not in allow_deep:
+        if (
+            pointer
+            and grandparent not in ('definitions', '$defs')
+            and 'properties' in data
+            and pointer not in allow_deep
+        ):
             errors += 1
             warn(f'{path} has "properties" within "properties" at {pointer}', DeepPropertiesWarning)
 
