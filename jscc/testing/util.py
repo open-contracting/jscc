@@ -8,7 +8,7 @@ from functools import lru_cache
 import requests
 
 
-@lru_cache()
+@lru_cache
 def http_get(url):
     """
     Sends and caches an HTTP GET request.
@@ -20,7 +20,7 @@ def http_get(url):
     return response
 
 
-@lru_cache()
+@lru_cache
 def http_head(url):
     """
     Sends and caches an HTTP HEAD request.
