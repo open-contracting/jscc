@@ -16,8 +16,8 @@ If you are viewing this on GitHub or PyPI, open the `full documentation <https:/
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/jscc.svg
    :target: https://pypi.org/project/jscc/
-.. |Build Status| image:: https://github.com/open-contracting/jscc/workflows/CI/badge.svg
-   :target: https://github.com/open-contracting/jscc/actions?query=workflow%3ACI
+.. |Build Status| image:: https://github.com/open-contracting/jscc/actions/workflows/ci.yml
+   :target: https://github.com/open-contracting//actions/workflows/ci.yml
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/jscc/badge.svg?branch=main
    :target: https://coveralls.io/github/open-contracting/jscc?branch=main
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/jscc.svg
