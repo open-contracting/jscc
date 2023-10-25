@@ -10,9 +10,15 @@ from jsonschema.validators import Draft4Validator
 
 import jscc.testing.checks
 from jscc.exceptions import DuplicateKeyError
-from jscc.testing.checks import (get_empty_files, get_invalid_json_files, get_misindented_files,
-                                 validate_codelist_enum, validate_object_id, validate_ref,
-                                 validate_schema_codelists_match)
+from jscc.testing.checks import (
+    get_empty_files,
+    get_invalid_json_files,
+    get_misindented_files,
+    validate_codelist_enum,
+    validate_object_id,
+    validate_ref,
+    validate_schema_codelists_match,
+)
 from tests import parse, path
 
 

@@ -4,8 +4,16 @@ import json
 import pytest
 
 from jscc.exceptions import DuplicateKeyError
-from jscc.schema import (extend_schema, get_types, is_array_of_objects, is_codelist, is_json_merge_patch,
-                         is_json_schema, is_missing_property, rejecting_dict)
+from jscc.schema import (
+    extend_schema,
+    get_types,
+    is_array_of_objects,
+    is_codelist,
+    is_json_merge_patch,
+    is_json_schema,
+    is_missing_property,
+    rejecting_dict,
+)
 from tests import parse, path
 
 

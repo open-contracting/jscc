@@ -94,9 +94,20 @@ from warnings import warn
 
 import jsonref
 
-from jscc.exceptions import (CodelistEnumWarning, DeepPropertiesWarning, DuplicateKeyError, ItemsTypeWarning,
-                             LetterCaseWarning, MergePropertiesWarning, MetadataPresenceWarning, NullTypeWarning,
-                             ObjectIdWarning, RefWarning, SchemaCodelistsMatchWarning, SchemaWarning)
+from jscc.exceptions import (
+    CodelistEnumWarning,
+    DeepPropertiesWarning,
+    DuplicateKeyError,
+    ItemsTypeWarning,
+    LetterCaseWarning,
+    MergePropertiesWarning,
+    MetadataPresenceWarning,
+    NullTypeWarning,
+    ObjectIdWarning,
+    RefWarning,
+    SchemaCodelistsMatchWarning,
+    SchemaWarning,
+)
 from jscc.schema import get_types, is_array_of_objects, is_codelist, is_missing_property, rejecting_dict
 from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
 from jscc.testing.util import difference
