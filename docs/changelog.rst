@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.4 (2024-01-29)
+------------------
+
+Changed
+~~~~~~~
+
+-  :meth:`jscc.testing.checks.validate_ref` accepts keyword arguments to pass to ``jsonref.replace_refs``.
+
 0.2.3 (2023-07-06)
 ------------------
 

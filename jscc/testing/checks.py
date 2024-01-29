@@ -655,7 +655,7 @@ def validate_merge_properties(*args):
     return _traverse(block)(*args)
 
 
-def validate_ref(path, data):
+def validate_ref(path, data, **kwargs):
     """
     Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
 
@@ -665,7 +665,7 @@ def validate_ref(path, data):
     :rtype: int
     """
     try:
-        jsonref.replace_refs(data, lazy_load=False)
+        jsonref.replace_refs(data, lazy_load=False, **kwargs)
     except jsonref.JsonRefError as e:
         warn(f"{path} has {e.message} at {'/'.join(map(str, e.path))}", RefWarning)
         return 1
