@@ -2,5 +2,44 @@
 requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "jscc"
+version = "0.2.4"
+authors = [{name = "Open Contracting Partnership and Open Data Services Co-operative Limited", email = "data@open-contracting.org"}]
+description = "Tools for data standards that use JSON Schema and CSV codelists"
+readme = "README.rst"
+license = {text = "BSD"}
+urls = {Homepage = "https://github.com/open-contracting/jscc"}
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "json-merge-patch",
+    "jsonref>=1",
+    "requests",
+]
+
+[project.optional-dependencies]
+test = [
+    "coverage",
+    "jsonschema",
+    "pytest",
+    "pytest-vcr",
+]
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+    "tests.*",
+]
+
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
