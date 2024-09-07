@@ -16,7 +16,5 @@ jobs:
           cache: pip
           cache-dependency-path: setup.cfg
       - run: pip install .[test]
-      - run: pytest -W error --cov jscc --vcr-record=none
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: coveralls --service=github
+      - run: coverage run --source=jscc -m pytest -W error --vcr-record=none
+      - uses: coverallsapp/github-action@v2
