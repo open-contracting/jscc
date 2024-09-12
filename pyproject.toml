@@ -32,7 +32,7 @@ test = [
     "coverage",
     "jsonschema",
     "pytest",
-    "pytest-vcr",
+    "pytest-recording",
 ]
 
 [tool.setuptools.packages.find]
