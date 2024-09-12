@@ -3,12 +3,12 @@
     "interactions": [
         {
             "request": {
-                "method": "HEAD",
+                "method": "GET",
                 "uri": "http://httpbin.org/status/400",
                 "body": null,
                 "headers": {
                     "User-Agent": [
-                        "python-requests/2.27.1"
+                        "python-requests/2.32.3"
                     ],
                     "Accept-Encoding": [
                         "gzip, deflate"
@@ -27,26 +27,26 @@
                     "message": "BAD REQUEST"
                 },
                 "headers": {
-                    "Date": [
-                        "Wed, 06 Apr 2022 15:44:04 GMT"
-                    ],
-                    "Access-Control-Allow-Credentials": [
-                        "true"
-                    ],
                     "Server": [
                         "gunicorn/19.9.0"
                     ],
                     "Connection": [
                         "keep-alive"
                     ],
+                    "Access-Control-Allow-Origin": [
+                        "*"
+                    ],
+                    "Date": [
+                        "Thu, 12 Sep 2024 18:38:48 GMT"
+                    ],
+                    "Access-Control-Allow-Credentials": [
+                        "true"
+                    ],
                     "Content-Type": [
                         "text/html; charset=utf-8"
                     ],
                     "Content-Length": [
                         "0"
-                    ],
-                    "Access-Control-Allow-Origin": [
-                        "*"
                     ]
                 },
                 "body": {
