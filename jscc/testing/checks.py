@@ -295,7 +295,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
         errors = 0
 
         parts = pointer.rsplit('/')
-        grandparent = parts[-2] if len(parts) >= 3 else None  # noqa: PLR2004
+        grandparent = parts[-2] if len(parts) >= 3 else None
         parent = parts[-1]
 
         # Look for metadata fields on user-defined objects only. (Add exceptional condition for "items" field.)
@@ -545,7 +545,7 @@ def validate_deep_properties(*args, allow_deep=()):
         errors = 0
 
         parts = pointer.rsplit('/', 2)
-        grandparent = parts[-2] if len(parts) == 3 else None  # noqa: PLR2004
+        grandparent = parts[-2] if len(parts) == 3 else None
 
         if (
             pointer
