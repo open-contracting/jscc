@@ -7,11 +7,11 @@ Changelog
 Changed
 ~~~~~~~
 
-Some arguments must be keyword arguments:
+-  Some arguments must be keyword arguments:
 
--  :meth:`jscc.testing.checks.validate_null_type`
--  :meth:`jscc.testing.checks.validate_schema_codelists_match`
--  :meth:`jscc.testing.checks.test_validate_codelist_enum`
+   -  :meth:`jscc.testing.checks.validate_null_type`
+   -  :meth:`jscc.testing.checks.validate_schema_codelists_match`
+   -  :meth:`jscc.testing.checks.test_validate_codelist_enum`
 
 0.2.4 (2024-01-29)
 ------------------
