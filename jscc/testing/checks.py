@@ -156,12 +156,12 @@ def get_empty_files(include=_true, **kwargs):
                 continue  # the file is non-empty, and might be binary
 
             if not text.strip():
-                yield path,
+                yield (path,)
             elif name.endswith('.json'):
                 try:
                     value = json.loads(text)
                     if not value and not isinstance(value, (bool, int, float)):
-                        yield path,
+                        yield (path,)
                 except json.decoder.JSONDecodeError:
                     continue  # the file is non-empty
 
@@ -189,7 +189,7 @@ def get_misindented_files(include=_true, **kwargs):
         if tracked(path) and include(path, name):
             expected = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
             if text != expected:
-                yield path,
+                yield (path,)
 
 
 def get_invalid_json_files(**kwargs):
@@ -209,7 +209,7 @@ def get_invalid_json_files(**kwargs):
             warn_and_assert(get_invalid_json_files(), '{0} is not valid JSON: {1}',
                             'JSON files are invalid. See warnings below.')
     """
-    for path, name in walk(**kwargs):
+    for path, _ in walk(**kwargs):
         if path.endswith('.json'):
             with open(path) as f:
                 text = f.read()
@@ -259,12 +259,12 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
         parent = pointer.rsplit('/', 1)[-1]
 
         if parent == 'properties':
-            for key in data.keys():
+            for key in data:
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
         elif parent in ('definitions', '$defs'):
-            for key in data.keys():
+            for key in data:
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} block isn't UpperCamelCase ASCII letters", LetterCaseWarning)
@@ -286,7 +286,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
                                    not have a "title" or "description" property
     :returns: the number of errors
     :rtype: int
-    """  # noqa: E501
+    """
     schema_fields = {'definitions', '$defs', 'deprecated', 'items', 'patternProperties', 'properties'}
     schema_sections = {'patternProperties'}
     required_properties = {'title', 'description'}
@@ -295,10 +295,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
         errors = 0
 
         parts = pointer.rsplit('/')
-        if len(parts) >= 3:
-            grandparent = parts[-2]
-        else:
-            grandparent = None
+        grandparent = parts[-2] if len(parts) >= 3 else None  # noqa: PLR2004
         parent = parts[-1]
 
         # Look for metadata fields on user-defined objects only. (Add exceptional condition for "items" field.)
@@ -318,7 +315,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
     return _traverse(block)(*args)
 
 
-def validate_null_type(path, data, pointer='', no_null=False, expect_null=True, allow_object_null=(),
+def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=True, allow_object_null=(),
                        allow_no_null=(), allow_null=()):
     """
     Warns and returns the number of errors relating to non-nullable optional fields and nullable required fields.
@@ -419,10 +416,8 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
         parent = pointer.rsplit('/', 1)[-1]
 
         if 'codelist' in data:
-            if 'type' not in data:  # e.g. if changing an existing property
-                types = fallback.get(pointer, ['array'])  # otherwise, assume "array"
-            else:
-                types = get_types(data)
+            # `type` can be missing if changing an existing property.
+            types = get_types(data) if 'type' in data else fallback.get(pointer, ['array'])
 
             if data['openCodelist']:
                 if ('string' in types and 'enum' in data or 'array' in types and 'enum' in data['items']):
@@ -550,10 +545,7 @@ def validate_deep_properties(*args, allow_deep=()):
         errors = 0
 
         parts = pointer.rsplit('/', 2)
-        if len(parts) == 3:
-            grandparent = parts[-2]
-        else:
-            grandparent = None
+        grandparent = parts[-2] if len(parts) == 3 else None  # noqa: PLR2004
 
         if (
             pointer
@@ -593,10 +585,7 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
         if 'type' in data and 'array' in data['type'] and 'properties' in data.get('items', {}):
             required = data['items'].get('required', [])
 
-            if hasattr(data['items'], '__reference__'):
-                original = data['items'].__reference__['$ref'][1:]
-            else:
-                original = pointer
+            original = data['items'].__reference__['$ref'][1:] if hasattr(data['items'], '__reference__') else pointer
 
             # See https://standard.open-contracting.org/latest/en/schema/merging/#whole-list-merge
             if 'id' not in data['items']['properties']:
@@ -673,7 +662,7 @@ def validate_ref(path, data, **kwargs):
     return 0
 
 
-def validate_schema_codelists_match(path, data, top, is_extension=False, is_profile=False, external_codelists=None):
+def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_profile=False, external_codelists=None):
     """
     Warns and returns the number of errors relating to mismatches between codelist files and codelist references from
     JSON Schema.
@@ -726,10 +715,7 @@ def validate_schema_codelists_match(path, data, top, is_extension=False, is_prof
                 codelist_files.add(csvname)
 
     codelist_values = collect_codelist_values(path, data)
-    if is_extension:
-        all_codelist_files = codelist_files | external_codelists
-    else:
-        all_codelist_files = codelist_files
+    all_codelist_files = codelist_files | external_codelists if is_extension else codelist_files
 
     unused_codelists = [codelist for codelist in codelist_files if codelist not in codelist_values]
     missing_codelists = [codelist for codelist in codelist_values if codelist not in all_codelist_files]

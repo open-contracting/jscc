@@ -13,9 +13,11 @@ def http_get(url):
     """
     Sends and caches an HTTP GET request.
 
+    .. attention:: No timeout is set. If a user can input a malicious URL, the program can hang indefinitely.
+
     :param str url: the URL to request
     """
-    response = requests.get(url)
+    response = requests.get(url)  # noqa: S113
     response.raise_for_status()
     return response
 
@@ -25,9 +27,11 @@ def http_head(url):
     """
     Sends and caches an HTTP HEAD request.
 
+    .. attention:: No timeout is set. If a user can input a malicious URL, the program can hang indefinitely.
+
     :param str url: the URL to request
     """
-    response = requests.head(url)
+    response = requests.head(url)  # noqa: S113
     response.raise_for_status()
     return response
 
@@ -48,16 +52,10 @@ def difference(actual, expected):
     :param set expected: the expected set
     """
     added = actual - expected
-    if added:
-        added = f'; added {added}'
-    else:
-        added = ''
+    added = f'; added {added}' if added else ''
 
     removed = expected - actual
-    if removed:
-        removed = f'; removed {removed}'
-    else:
-        removed = ''
+    removed = f'; removed {removed}' if removed else ''
 
     return added, removed
 
@@ -75,4 +73,4 @@ def warn_and_assert(paths, warn_message, assert_message):
         warnings.warn('ERROR: ' + warn_message.format(*args))
         success = False
 
-    assert success, assert_message
+    assert success, assert_message  # noqa: S101

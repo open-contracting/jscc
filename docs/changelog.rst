@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.3.0 (Unreleased)
+------------------
+
+Changed
+~~~~~~~
+
+Some arguments must be keyword arguments:
+
+   -  :meth:`jscc.testing.checks.validate_null_type`
+   -  :meth:`jscc.testing.checks.validate_schema_codelists_match`
+   -  :meth:`jscc.testing.checks.test_validate_codelist_enum`
+
 0.2.4 (2024-01-29)
 ------------------
 
@@ -19,7 +31,7 @@ Changed
 
   -  :meth:`jscc.testing.checks.validate_letter_case`
   -  :meth:`jscc.testing.checks.validate_metadata_presence`
-  -  :meth:`jscc.testing.checks.validate_null_types`
+  -  :meth:`jscc.testing.checks.validate_null_type`
   -  :meth:`jscc.testing.checks.validate_deep_properties`
   -  :meth:`jscc.schema.is_json_schema`
   -  :meth:`jscc.schema.is_json_merge_patch`

@@ -33,9 +33,8 @@ def test_http_get_error():
 
 
 def test_warn_and_assert():
-    with pytest.raises(AssertionError) as excinfo:
-        with pytest.warns(UserWarning) as records:
-            warn_and_assert([('path/',)], '{0} is invalid', 'See errors above')
+    with pytest.raises(AssertionError) as excinfo, pytest.warns(UserWarning) as records:
+        warn_and_assert([('path/',)], '{0} is invalid', 'See errors above')
 
     assert len(records) == 1
     assert str(records[0].message) == 'ERROR: path/ is invalid'

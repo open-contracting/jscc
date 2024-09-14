@@ -95,12 +95,11 @@ def test_get_invalid_json_files():
 
 def test_validate_codelist_enum():
     directory = os.path.realpath(path('schema')) + os.sep
-    with chdir(directory):
-        with pytest.warns(UserWarning) as records:
-            filepath = os.path.join(directory, 'codelist_enum.json')
-            with open(filepath) as f:
-                data = json.load(f)
-            errors = validate_codelist_enum(filepath, data)
+    with chdir(directory), pytest.warns(UserWarning) as records:
+        filepath = os.path.join(directory, 'codelist_enum.json')
+        with open(filepath) as f:
+            data = json.load(f)
+        errors = validate_codelist_enum(filepath, data)
 
     assert sorted(str(record.message).replace(directory, '') for record in records) == [
         'codelist_enum.json is missing "codelist" and "openCodelist" at /properties/noCodelistArray',

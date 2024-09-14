@@ -79,6 +79,11 @@ def extend_schema(basename, schema, metadata, codelists=None):
 
     If :code:`codelists` is provided, it will be updated with the codelists from the dependencies.
 
+    .. attention::
+
+       No timeout is set. If a user can input malicious ``metadata`` with unresponsive ``dependencies`` or
+       ``testDependencies`` URLs, the program can hang indefinitely.
+
     :param str basename: the JSON Schema file's basename
     :param dict schema: the JSON Schema file's parsed contents
     :param dict metadata: the extension metadata file's parsed contents
