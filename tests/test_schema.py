@@ -17,7 +17,7 @@ from jscc.schema import (
 from tests import parse, path
 
 
-@pytest.mark.parametrize('filename,expected', [
+@pytest.mark.parametrize(('filename', 'expected'), [
     ('codelist.csv', True),
     ('data.csv', False),
 ])
@@ -28,7 +28,7 @@ def test_is_codelist(filename, expected):
         assert is_codelist(reader.fieldnames) == expected
 
 
-@pytest.mark.parametrize('filename,expected', [
+@pytest.mark.parametrize(('filename', 'expected'), [
     ('schema.json', True),
     ('patch.json', True),
 ])
@@ -36,7 +36,7 @@ def test_is_json_schema(filename, expected):
     assert is_json_schema(parse(filename)) == expected
 
 
-@pytest.mark.parametrize('filename,expected', [
+@pytest.mark.parametrize(('filename', 'expected'), [
     ('schema.json', False),
     ('patch.json', True),
 ])
@@ -44,7 +44,7 @@ def test_is_json_merge_patch(filename, expected):
     assert is_json_merge_patch(parse(filename)) == expected
 
 
-@pytest.mark.parametrize('field,expected', [
+@pytest.mark.parametrize(('field', 'expected'), [
     ('arrayProperties', True),
     ('arrayRef', True),
     ('arrayType', False),
@@ -53,7 +53,7 @@ def test_is_array_of_objects(field, expected):
     assert is_array_of_objects(parse('schema.json')['properties'][field]) == expected
 
 
-@pytest.mark.parametrize('prop,expected', [
+@pytest.mark.parametrize(('prop', 'expected'), [
     ('title', True),
     ('description', True),
     ('type', True),
@@ -67,7 +67,7 @@ def test_is_missing_property(prop, expected):
     assert is_missing_property(parse('schema.json')['properties']['metadata'], prop) == expected
 
 
-@pytest.mark.parametrize('field,expected', [
+@pytest.mark.parametrize(('field', 'expected'), [
     ('metadata', []),
     ('arrayProperties', ['array']),
     ('mixed', ['string', 'null']),

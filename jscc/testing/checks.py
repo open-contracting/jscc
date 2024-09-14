@@ -113,14 +113,14 @@ from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
 from jscc.testing.util import difference
 
 
-def _true(*args):
+def _true(*_args):
     """
     Returns ``True`` (used internally as a default method).
     """
     return True
 
 
-def _false(*args):
+def _false(*_args):
     """
     Returns ``False`` (used internally as a default method).
     """
@@ -220,7 +220,7 @@ def get_invalid_json_files(**kwargs):
                         yield path, e
 
 
-def validate_schema(path, data, validator):
+def validate_schema(path, data, validator):  # noqa: ARG001 # consistency
     """
     Warns and returns the number of errors relating to JSON Schema validation.
 
