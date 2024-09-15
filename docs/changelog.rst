@@ -7,6 +7,7 @@ Changelog
 Changed
 ~~~~~~~
 
+-  Ignore ``.venv`` and ``vendor`` directories.
 -  Some arguments must be keyword arguments:
 
    -  :meth:`jscc.testing.checks.validate_null_type`

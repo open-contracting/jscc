@@ -12,8 +12,10 @@ untracked = {
     '*.egg-info',
     '.tox',
     '.ve',
+    '.venv',
     'htmlcov',
     'node_modules',
+    'vendor',
 }
 
 

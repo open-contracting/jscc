@@ -73,4 +73,4 @@ def warn_and_assert(paths, warn_message, assert_message):
         warnings.warn('ERROR: ' + warn_message.format(*args))
         success = False
 
-    assert success, assert_message  # noqa: S101
+    assert success, assert_message  # noqa: S101 # false positive
