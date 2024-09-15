@@ -1,13 +1,13 @@
 class JSCCError(Exception):
-    """Base class for exceptions from within this package"""
+    """Base class for exceptions from within this package."""
 
 
 class DuplicateKeyError(JSCCError):
-    """Raised if a JSON message has members with duplicate names"""
+    """Raised if a JSON message has members with duplicate names."""
 
 
 class JSCCWarning(UserWarning):
-    """Base class for warnings from within this package"""
+    """Base class for warnings from within this package."""
 
 
 class CodelistEnumWarning(JSCCWarning):

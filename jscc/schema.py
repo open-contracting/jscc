@@ -1,6 +1,4 @@
-"""
-Methods for interacting with or reasoning about JSON Schema and CSV codelists.
-"""
+"""Methods for interacting with or reasoning about JSON Schema and CSV codelists."""
 from collections import UserDict
 from copy import deepcopy
 
@@ -60,7 +58,7 @@ def is_missing_property(field, prop):
 
 def get_types(field):
     """
-    Returns a field's "type" as a list.
+    Return a field's "type" as a list.
 
     :param dict field: the field
     :returns: a field's "type"
@@ -109,19 +107,17 @@ def extend_schema(basename, schema, metadata, codelists=None):
 
 
 class RejectingDict(UserDict):
-    """
-    A ``dict`` that raises an error if a key is set more than once.
-    """
+    """A ``dict`` that raises an error if a key is set more than once."""
+
     # See https://tools.ietf.org/html/rfc7493#section-2.3
     def __setitem__(self, k, v):
+        """Raise :class:`~jscc.exceptions.DuplicateKeyError` if key already exists."""
         if k in self:
             raise DuplicateKeyError(k)
         return super().__setitem__(k, v)
 
 
 def rejecting_dict(pairs):
-    """
-    An ``object_pairs_hook`` method that allows a key to be set at most once.
-    """
+    """Allow a key to be set at most once. Use as an ``object_pairs_hook`` method."""
     # Return the wrapped dict, not the RejectingDict itself, because jsonschema checks the type.
     return RejectingDict(pairs).data

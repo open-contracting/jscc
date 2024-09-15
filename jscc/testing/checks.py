@@ -1,9 +1,8 @@
 """
-This module offers ``get_*`` functions to check for empty files, misindented JSON files, and invalid JSON files. See
-"pytest example" in each function's documentation for usage examples.
-
-This module also offers ``validate_*`` methods to test JSON Schema. Each method's behavior is customizable, and not all
-methods are relevant to all schema.
+-  ``get_*`` functions to check for empty files, misindented JSON files, and invalid JSON files.
+   See "pytest example" in each function's documentation for usage examples.
+-  ``validate_*`` methods to test JSON Schema.
+   Each method's behavior is customizable, and not all methods are relevant to all schema.
 
 The typical usage is to first define a test method like so:
 
@@ -114,22 +113,18 @@ from jscc.testing.util import difference
 
 
 def _true(*_args):
-    """
-    Returns ``True`` (used internally as a default method).
-    """
+    """Return ``True`` (used internally as a default method)."""
     return True
 
 
 def _false(*_args):
-    """
-    Returns ``False`` (used internally as a default method).
-    """
+    """Return ``False`` (used internally as a default method)."""
     return False
 
 
 def get_empty_files(include=_true, **kwargs):
     """
-    Yields the path (as a tuple) of any file that is empty.
+    Yield the path (as a tuple) of any file that is empty.
 
     JSON files are empty if their parsed contents are empty (empty array, empty object, empty string or ``null``).
     Other files are empty if they contain whitespace only.
@@ -167,10 +162,10 @@ def get_empty_files(include=_true, **kwargs):
 
 
 def get_misindented_files(include=_true, **kwargs):
-    """
-    Yields the path (as a tuple) of any JSON file that isn't formatted for humans.
+    r"""
+    Yield the path (as a tuple) of any JSON file that isn't formatted for humans.
 
-    JSON files must be indented with two spaces, mustn't escape non-ASCII characters (no ``\\uXXXX`` sequences), and
+    JSON files must be indented with two spaces, mustn't escape non-ASCII characters (no ``\uXXXX`` sequences), and
     must have a newline at end of file.
 
     :param function include: a method that accepts a file path and file name, and returns whether to test the file
@@ -194,7 +189,7 @@ def get_misindented_files(include=_true, **kwargs):
 
 def get_invalid_json_files(**kwargs):
     """
-    Yields the path and exception (as a tuple) of any JSON file that isn't valid.
+    Yield the path and exception (as a tuple) of any JSON file that isn't valid.
 
     JSON files must be parsed without error by the ``json`` module, and JSON objects mustn't have duplicate keys.
 
@@ -222,7 +217,7 @@ def get_invalid_json_files(**kwargs):
 
 def validate_schema(path, data, validator):  # noqa: ARG001 # consistency
     """
-    Warns and returns the number of errors relating to JSON Schema validation.
+    Warn and return the number of errors relating to JSON Schema validation.
 
     Uses the `jsonschema <https://python-jsonschema.readthedocs.io/>`__ module.
 
@@ -242,7 +237,7 @@ def validate_schema(path, data, validator):  # noqa: ARG001 # consistency
 
 def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()):
     """
-    Warns and returns the number of errors relating to the letter case of properties and definitions.
+    Warn and return the number of errors relating to the letter case of properties and definitions.
 
     Property names must be lowerCamelCase. Definition names must be UpperCamelCase. All must be ASCII letters only.
 
@@ -276,7 +271,7 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
 
 def validate_metadata_presence(*args, allow_missing=_false):
     """
-    Warns and returns the number of errors relating to metadata in a JSON Schema.
+    Warn and return the number of errors relating to metadata in a JSON Schema.
 
     The root schema and each field must have `"type" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2>`__,
     `"title" and "description" <https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.1>`__
@@ -318,7 +313,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
 def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=True, allow_object_null=(),
                        allow_no_null=(), allow_null=()):
     """
-    Warns and returns the number of errors relating to non-nullable optional fields and nullable required fields.
+    Warn and return the number of errors relating to non-nullable optional fields and nullable required fields.
 
     If :code:`no_null` is ``True``, then "type" properties mustn't include "null".
 
@@ -386,7 +381,7 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
 
 def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missing=_false):
     """
-    Warns and returns the number of errors relating to codelists in a JSON Schema.
+    Warn and return the number of errors relating to codelists in a JSON Schema.
 
     If a field has a "codelist" property but no "type" property (e.g. if the "codelist" property is being overwritten),
     then its "type" is assumed to be "array" unless a fallback "type" is provided via :code:`fallback`.
@@ -471,7 +466,7 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
 
 def validate_array_items(*args, allow_invalid=()):
     """
-    Warns and returns the number of errors relating to array fields without an "items" property.
+    Warn and return the number of errors relating to array fields without an "items" property.
 
     A field whose "type" property includes "array" must set the "items" property.
 
@@ -494,7 +489,7 @@ def validate_array_items(*args, allow_invalid=()):
 
 def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
     """
-    Warns and returns the number of errors relating to the "type" property under an "items" property.
+    Warn and return the number of errors relating to the "type" property under an "items" property.
 
     The "type" property under an "items" property must only include "array" (e.g. for geometries), "number"
     (e.g. for coordinates) and/or "string".
@@ -532,7 +527,7 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
 
 def validate_deep_properties(*args, allow_deep=()):
     """
-    Warns and returns the number of errors relating to deep objects.
+    Warn and return the number of errors relating to deep objects.
 
     The schema must use "definitions" or "$defs" instead of nesting "properties".
 
@@ -563,7 +558,7 @@ def validate_deep_properties(*args, allow_deep=()):
 
 def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     """
-    Warns and returns the number of errors relating to objects within arrays lacking "id" fields.
+    Warn and return the number of errors relating to objects within arrays lacking "id" fields.
 
     If an array field's "wholeListMerge" and "omitWhenMerged" properties aren't set or are set to ``false`` or
     ``null``, then the object fields under it must have an "id" field, and the "id" field must be required.
@@ -610,7 +605,7 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
 
 def validate_merge_properties(*args):
     """
-    Warns and returns the number of errors relating to missing or extra merge properties.
+    Warn and return the number of errors relating to missing or extra merge properties.
 
     The "omitWhenMerged" and "wholeListMerge" properties mustn't both be set, and mustn't be set to ``false`` or
     ``null``. The "wholeListMerge" property must be set on non-nullable arrays of objects only.
@@ -646,7 +641,7 @@ def validate_merge_properties(*args):
 
 def validate_ref(path, data, **kwargs):
     """
-    Warns and returns ``1`` if not all ``$ref``'erences can be resolved.
+    Warn and return ``1`` if not all ``$ref``'erences can be resolved.
 
     Uses the `jsonref <https://jsonref.readthedocs.io/>`__ module.
 
@@ -664,7 +659,7 @@ def validate_ref(path, data, **kwargs):
 
 def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_profile=False, external_codelists=None):
     """
-    Warns and returns the number of errors relating to mismatches between codelist files and codelist references from
+    Warn and return the number of errors relating to mismatches between codelist files and codelist references from
     JSON Schema.
 
     All codelist filenames that don't start with ``+`` or ``-`` must match codelist references. All codelist references
@@ -683,9 +678,7 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
         external_codelists = set()
 
     def collect_codelist_values(path, data, pointer=''):
-        """
-        Collects ``codelist`` values from JSON Schema.
-        """
+        """Collect ``codelist`` values from JSON Schema."""
         codelists = set()
 
         if isinstance(data, list):
@@ -731,9 +724,6 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
 
 
 def _traverse(block):
-    """
-    Implements common logic used by ``validate_*`` methods.
-    """
     def method(path, data, pointer=''):
         errors = 0
 

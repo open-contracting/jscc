@@ -1,6 +1,4 @@
-"""
-Methods for interacting with or reasoning about the filesystem.
-"""
+"""Methods for interacting with or reasoning about the filesystem."""
 
 import csv
 import json
@@ -21,7 +19,7 @@ untracked = {
 
 def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
     """
-    Walks a directory tree, and yields tuples consistent of a file path and file name, excluding Git files and
+    Walk a directory tree, and yield tuples consistent of a file path and file name, excluding Git files and
     third-party files under virtual environment, static, build, and test fixture directories (by default).
 
     :param str top: the file path of the directory tree
@@ -40,7 +38,7 @@ def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
 
 def walk_json_data(patch=None, **kwargs):
     """
-    Walks a directory tree, and yields tuples consisting of a file path, file name, text content, and JSON data.
+    Walk a directory tree, and yield tuples consisting of a file path, file name, text content, and JSON data.
 
     Accepts the same keyword arguments as :meth:`jscc.testing.filesystem.walk`.
 
@@ -61,7 +59,7 @@ def walk_json_data(patch=None, **kwargs):
 
 def walk_csv_data(**kwargs):
     """
-    Walks a directory tree, and yields tuples consisting of a file path, file name, text content, fieldnames, and rows.
+    Walk a directory tree, and yield tuples consisting of a file path, file name, text content, fieldnames, and rows.
 
     Accepts the same keyword arguments as :meth:`jscc.testing.filesystem.walk`.
     """
@@ -80,7 +78,7 @@ def walk_csv_data(**kwargs):
 
 def tracked(path):
     """
-    Returns whether the path isn't typically untracked in Git repositories.
+    Return whether the path isn't typically untracked in Git repositories.
 
     :param str path: a file path
     """

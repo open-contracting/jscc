@@ -1,6 +1,4 @@
-"""
-Miscellaneous methods, mainly used by other repositories.
-"""
+"""Miscellaneous methods, mainly used by other repositories."""
 
 import warnings
 from functools import lru_cache
@@ -11,7 +9,7 @@ import requests
 @lru_cache
 def http_get(url):
     """
-    Sends and caches an HTTP GET request.
+    Send and cache an HTTP GET request.
 
     .. attention:: No timeout is set. If a user can input a malicious URL, the program can hang indefinitely.
 
@@ -25,7 +23,7 @@ def http_get(url):
 @lru_cache
 def http_head(url):
     """
-    Sends and caches an HTTP HEAD request.
+    Send and cache an HTTP HEAD request.
 
     .. attention:: No timeout is set. If a user can input a malicious URL, the program can hang indefinitely.
 
@@ -38,7 +36,7 @@ def http_head(url):
 
 def difference(actual, expected):
     """
-    Returns strings describing the differences between actual and expected sets.
+    Return strings describing the differences between actual and expected sets.
 
     Example::
 
@@ -62,7 +60,7 @@ def difference(actual, expected):
 
 def warn_and_assert(paths, warn_message, assert_message):
     """
-    If ``paths`` isn't empty, issues a warning for each path, and raises an assertion error.
+    If ``paths`` isn't empty, issue a warning for each path, and raise an assertion error.
 
     :param list paths: file paths
     :param str warn_message: the format string for the warning message
