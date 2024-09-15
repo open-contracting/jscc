@@ -1,18 +1,20 @@
 Changelog
 =========
 
-0.3.0 (Unreleased)
+0.3.0 (2024-09-15)
 ------------------
 
 Changed
 ~~~~~~~
 
 -  Ignore ``.venv`` and ``vendor`` directories.
--  Some arguments must be keyword arguments:
+-  Some arguments must be keyword arguments in:
 
    -  :meth:`jscc.testing.checks.validate_null_type`
    -  :meth:`jscc.testing.checks.validate_schema_codelists_match`
    -  :meth:`jscc.testing.checks.test_validate_codelist_enum`
+
+-  Drop support for Python 3.8.
 
 0.2.4 (2024-01-29)
 ------------------
@@ -21,6 +23,7 @@ Changed
 ~~~~~~~
 
 -  :meth:`jscc.testing.checks.validate_ref` accepts keyword arguments to pass to ``jsonref.replace_refs``.
+-  Drop support for Python 3.7.
 
 0.2.3 (2023-07-06)
 ------------------
@@ -84,7 +87,7 @@ Changed
 Changed
 ~~~~~~~
 
--  Drop support for Python 3.6 (end-of-life 2021-12-23).
+-  Drop support for Python 3.6.
 
 Fixed
 ~~~~~
