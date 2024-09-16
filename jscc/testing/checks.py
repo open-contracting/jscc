@@ -112,12 +112,12 @@ from jscc.testing.filesystem import tracked, walk, walk_csv_data, walk_json_data
 from jscc.testing.util import difference
 
 
-def _true(*_args):
+def _true(*args):
     """Return ``True`` (used internally as a default method)."""
     return True
 
 
-def _false(*_args):
+def _false(*args):
     """Return ``False`` (used internally as a default method)."""
     return False
 
