@@ -258,7 +258,7 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
                 if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
-        elif parent in ('definitions', '$defs'):
+        elif parent in {'definitions', '$defs'}:
             for key in data:
                 if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
                     errors += 1
@@ -366,7 +366,7 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
         required = data.get('required', [])
 
         for key, value in data.items():
-            if key in ('properties', 'definitions', '$defs'):
+            if key in {'properties', 'definitions', '$defs'}:
                 for k, v in data[key].items():
                     expect_null = key == 'properties' and k not in required
                     errors += validate_null_type(path, v, pointer=f'{pointer}/{key}/{k}', **kwargs, no_null=no_null,
@@ -544,7 +544,7 @@ def validate_deep_properties(*args, allow_deep=()):
 
         if (
             pointer
-            and grandparent not in ('definitions', '$defs')
+            and grandparent not in {'definitions', '$defs'}
             and 'properties' in data
             and pointer not in allow_deep
         ):
