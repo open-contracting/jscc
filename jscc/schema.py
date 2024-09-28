@@ -90,8 +90,7 @@ def extend_schema(basename, schema, metadata, codelists=None):
     :rtype: dict
     """
     def recurse(metadata):
-        urls = metadata.get('dependencies', []) + metadata.get('testDependencies', [])
-        for metadata_url in urls:
+        for metadata_url in metadata.get('dependencies', []) + metadata.get('testDependencies', []):
             patch_url = f"{metadata_url.rsplit('/', 1)[0]}/{basename}"
             metadata = http_get(metadata_url).json()
             patch = http_get(patch_url).json()
