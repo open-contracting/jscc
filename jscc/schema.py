@@ -82,6 +82,11 @@ def extend_schema(basename, schema, metadata, codelists=None):
        No timeout is set. If a user can input malicious ``metadata`` with unresponsive ``dependencies`` or
        ``testDependencies`` URLs, the program can hang indefinitely.
 
+    .. attention::
+
+       This function is vulnerable to server-side request forgery (SSRF). A user can create an extension whose
+       dependencies point to internal resources, which would receive a GET request.
+
     :param str basename: the JSON Schema file's basename
     :param dict schema: the JSON Schema file's parsed contents
     :param dict metadata: the extension metadata file's parsed contents
