@@ -17,7 +17,7 @@ untracked = {
 }
 
 
-def walk(top=None, excluded=('.git', '.ve', '_static', 'build', 'fixtures')):
+def walk(top=None, excluded=('.git', '.ve', '.venv', '_static', 'build', 'fixtures')):
     """
     Walk a directory tree, and yield tuples consistent of a file path and file name, excluding Git files and
     third-party files under virtual environment, static, build, and test fixture directories (by default).
