@@ -294,7 +294,7 @@ def validate_metadata_presence(*args, allow_missing=_false):
         parent = parts[-1]
 
         # Look for metadata fields on user-defined objects only. (Add exceptional condition for "items" field.)
-        if parent not in schema_fields and grandparent not in schema_sections or grandparent == 'properties':
+        if (parent not in schema_fields and grandparent not in schema_sections) or grandparent == 'properties':
             for prop in required_properties:
                 # If a field has `$ref`, then its `title` and `description` might defer to the reference.
                 if is_missing_property(data, prop) and '$ref' not in data and not allow_missing(pointer):
@@ -415,12 +415,12 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
             types = get_types(data) if 'type' in data else fallback.get(pointer, ['array'])
 
             if data['openCodelist']:
-                if ('string' in types and 'enum' in data or 'array' in types and 'enum' in data['items']):
+                if (('string' in types and 'enum' in data) or ('array' in types and 'enum' in data['items'])):
                     errors += 1
                     warn(f'{path} sets "enum", though "openCodelist" is true, at {pointer}',
                          CodelistEnumWarning)
             else:
-                if 'string' in types and 'enum' not in data or 'array' in types and 'enum' not in data['items']:
+                if ('string' in types and 'enum' not in data) or ('array' in types and 'enum' not in data['items']):
                     errors += 1
                     warn(f'{path} is missing "enum", though "openCodelist" is false, at {pointer}',
                          CodelistEnumWarning)
@@ -454,7 +454,7 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                         errors += 1
                         warn(f"{path} refers to missing file codelists/{data['codelist']} at {pointer}",
                              CodelistEnumWarning)
-        elif 'enum' in data and parent != 'items' or 'items' in data and 'enum' in data['items']:
+        elif ('enum' in data and parent != 'items') or ('items' in data and 'enum' in data['items']):
             if not allow_enum(pointer):
                 errors += 1
                 warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)

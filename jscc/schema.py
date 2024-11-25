@@ -52,8 +52,8 @@ def is_missing_property(field, prop):
     :returns: whether a field's property isn't set, is empty, or is whitespace
     :rtype: bool
     """
-    return prop not in field or not field[prop] and not isinstance(field[prop], (bool, int, float)) or \
-        isinstance(field[prop], str) and not field[prop].strip()
+    return prop not in field or (not field[prop] and not isinstance(field[prop], (bool, int, float))) or \
+        (isinstance(field[prop], str) and not field[prop].strip())
 
 
 def get_types(field):
