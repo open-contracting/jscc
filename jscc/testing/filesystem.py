@@ -53,7 +53,7 @@ def walk_json_data(patch=None, **kwargs):
                         text = patch(text)
                     try:
                         yield path, name, text, json.loads(text)
-                    except json.decoder.JSONDecodeError:
+                    except json.JSONDecodeError:
                         continue
 
 

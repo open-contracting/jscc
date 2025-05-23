@@ -88,7 +88,7 @@ def test_get_invalid_json_files():
 
         assert len(results) == 2
         assert isinstance(results['duplicate-key.json'], DuplicateKeyError)
-        assert isinstance(results['invalid.json'], json.decoder.JSONDecodeError)
+        assert isinstance(results['invalid.json'], json.JSONDecodeError)
         assert str(results['duplicate-key.json']) == 'x'
         assert str(results['invalid.json']) == 'Expecting property name enclosed in double quotes: line 2 column 1 (char 2)'  # noqa: E501
 

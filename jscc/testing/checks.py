@@ -157,7 +157,7 @@ def get_empty_files(include=_true, **kwargs):
                     value = json.loads(text)
                     if not value and not isinstance(value, (bool, int, float)):
                         yield (path,)
-                except json.decoder.JSONDecodeError:
+                except json.JSONDecodeError:
                     continue  # the file is non-empty
 
 
@@ -211,7 +211,7 @@ def get_invalid_json_files(**kwargs):
                 if text:
                     try:
                         json.loads(text, object_pairs_hook=rejecting_dict)
-                    except (json.decoder.JSONDecodeError, DuplicateKeyError) as e:
+                    except (json.JSONDecodeError, DuplicateKeyError) as e:
                         yield path, e
 
 
