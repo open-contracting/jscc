@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+-  Use the new ``ArrayItemsWarning`` warning, instead of the incorrect ``DeepPropertiesWarning`` warning, in :meth:`jscc.testing.checks.validate_array_items`.
+
 0.3.0 (2024-09-15)
 ------------------
 

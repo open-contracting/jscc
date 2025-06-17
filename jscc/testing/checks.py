@@ -368,7 +368,7 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
 
         for key, value in data.items():
             if key in {'properties', 'definitions', '$defs'}:
-                for k, v in data[key].items():
+                for k, v in value.items():
                     expect_null = key == 'properties' and k not in required
                     errors += validate_null_type(path, v, pointer=f'{pointer}/{key}/{k}', **kwargs, no_null=no_null,
                                                  expect_null=expect_null)

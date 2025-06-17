@@ -9,7 +9,21 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator
 
 import jscc.testing.checks
-from jscc.exceptions import DuplicateKeyError
+from jscc.exceptions import (
+    ArrayItemsWarning,
+    CodelistEnumWarning,
+    DeepPropertiesWarning,
+    DuplicateKeyError,
+    ItemsTypeWarning,
+    LetterCaseWarning,
+    MergePropertiesWarning,
+    MetadataPresenceWarning,
+    NullTypeWarning,
+    ObjectIdWarning,
+    RefWarning,
+    SchemaCodelistsMatchWarning,
+    SchemaWarning,
+)
 from jscc.testing.checks import (
     get_empty_files,
     get_invalid_json_files,
@@ -95,10 +109,12 @@ def test_get_invalid_json_files():
 
 def test_validate_codelist_enum():
     directory = os.path.realpath(path('schema')) + os.sep
-    with chdir(directory), pytest.warns(UserWarning) as records:
-        filepath = os.path.join(directory, 'codelist_enum.json')
-        with open(filepath) as f:
-            data = json.load(f)
+
+    filepath = os.path.join(directory, 'codelist_enum.json')
+    with open(filepath) as f:
+        data = json.load(f)
+
+    with chdir(directory), pytest.warns(CodelistEnumWarning) as records:
         errors = validate_codelist_enum(filepath, data)
 
     assert sorted(str(record.message).replace(directory, '') for record in records) == [
@@ -116,7 +132,7 @@ def test_validate_codelist_enum():
 
 
 def test_validate_deep_properties():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(DeepPropertiesWarning) as records:
         errors = validate('deep_properties', allow_deep={'/properties/allow'})
 
     assert sorted(str(record.message) for record in records) == [
@@ -126,7 +142,7 @@ def test_validate_deep_properties():
 
 
 def test_validate_array_items():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(ArrayItemsWarning) as records:
         errors = validate('array_items', allow_invalid={'/properties/allow'})
 
     assert sorted(str(record.message) for record in records) == [
@@ -136,7 +152,7 @@ def test_validate_array_items():
 
 
 def test_validate_items_type():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(ItemsTypeWarning) as records:
         errors = validate('items_type', additional_valid_types=['boolean'],
                           allow_invalid={'/properties/allow/items'})
 
@@ -147,7 +163,7 @@ def test_validate_items_type():
 
 
 def test_validate_letter_case():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(LetterCaseWarning) as records:
         errors = validate('letter_case', property_exceptions={'Allow'}, definition_exceptions={'allow'})
 
     assert sorted(str(record.message) for record in records) == [
@@ -160,7 +176,7 @@ def test_validate_letter_case():
 
 
 def test_validate_merge_properties():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(MergePropertiesWarning) as records:
         errors = validate('merge_properties')
 
     assert sorted(str(record.message) for record in records) == [
@@ -176,7 +192,7 @@ def test_validate_metadata_presence():
     def allow_missing(pointer):
         return pointer == '/properties/allow'
 
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(MetadataPresenceWarning) as records:
         errors = validate('metadata_presence', allow_missing=allow_missing)
 
     assert sorted(str(record.message) for record in records) == [
@@ -188,7 +204,7 @@ def test_validate_metadata_presence():
 
 
 def test_validate_null_type():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(NullTypeWarning) as records:
         errors = validate('null_type')
 
     assert sorted(str(record.message) for record in records) == [
@@ -201,7 +217,7 @@ def test_validate_null_type():
 
 
 def test_validate_null_type_no_null():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(NullTypeWarning) as records:
         errors = validate('null_type', no_null=True)
 
     assert sorted(str(record.message) for record in records) == [
@@ -218,7 +234,7 @@ def test_validate_object_id():
         return pointer == '/properties/allowMissing'
 
     filepath = os.path.join('schema', 'object_id.json')
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(ObjectIdWarning) as records:
         errors = validate_object_id(path(filepath), jsonref.replace_refs(parse(filepath)), allow_missing=allow_missing,
                                     allow_optional='/properties/allowOptional')
 
@@ -243,7 +259,7 @@ def test_validate_ref_pass():
 
 
 def test_validate_ref_fail():
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(RefWarning) as records:
         errors = validate('ref')
 
     assert sorted(str(record.message) for record in records) == [
@@ -254,7 +270,7 @@ def test_validate_ref_fail():
 
 def test_validate_schema():
     validator = Draft4Validator(parse('meta-schema.json'), format_checker=FormatChecker())
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(SchemaWarning) as records:
         errors = validate('schema', validator)
 
     assert [str(record.message) for record in records] == [
@@ -265,7 +281,7 @@ def test_validate_schema():
 
 def test_validate_schema_codelists_match():
     filepath = os.path.join('schema', 'codelist_enum.json')
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(SchemaCodelistsMatchWarning) as records:
         errors = validate_schema_codelists_match(path(filepath), parse(filepath), path('schema'))
 
     assert sorted(str(record.message) for record in records) == [
@@ -278,7 +294,7 @@ def test_validate_schema_codelists_match():
 
 def test_validate_schema_codelists_match_codelist():
     filepath = os.path.join('schema', 'codelist_enum.json')
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(SchemaCodelistsMatchWarning) as records:
         errors = validate_schema_codelists_match(path(filepath), parse(filepath), path('schema'), is_extension=True,
                                                  external_codelists={'failOpenArray.csv', 'failOpenString.csv'})
 
