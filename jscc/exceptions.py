@@ -10,6 +10,10 @@ class JSCCWarning(UserWarning):
     """Base class for warnings from within this package."""
 
 
+class ArrayItemsWarning(JSCCWarning):
+    pass
+
+
 class CodelistEnumWarning(JSCCWarning):
     pass
 

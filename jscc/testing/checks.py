@@ -94,6 +94,7 @@ from warnings import warn
 import jsonref
 
 from jscc.exceptions import (
+    ArrayItemsWarning,
     CodelistEnumWarning,
     DeepPropertiesWarning,
     DuplicateKeyError,
@@ -480,7 +481,7 @@ def validate_array_items(*args, allow_invalid=()):
 
         if 'type' in data and 'array' in data['type'] and 'items' not in data and pointer not in allow_invalid:
             errors += 1
-            warn(f'{path} is missing "items" at {pointer}', DeepPropertiesWarning)
+            warn(f'{path} is missing "items" at {pointer}', ArrayItemsWarning)
 
         return errors
 
