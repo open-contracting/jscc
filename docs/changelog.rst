@@ -9,6 +9,12 @@ Fixed
 
 -  Use the new ``ArrayItemsWarning`` warning, instead of the incorrect ``DeepPropertiesWarning`` warning, in :meth:`jscc.testing.checks.validate_array_items`.
 
+Changed
+~~~~~~~
+
+-  Add support for Python 3.13.
+-  Drop support for Python 3.9.
+
 0.3.0 (2024-09-15)
 ------------------
 
@@ -92,15 +98,15 @@ Changed
 0.1.1 (2023-04-19)
 ------------------
 
-Changed
-~~~~~~~
-
--  Drop support for Python 3.6.
-
 Fixed
 ~~~~~
 
 -  :meth:`jscc.testing.checks.get_empty_files` correctly returns JSON files that are whitespace only.
+
+Changed
+~~~~~~~
+
+-  Drop support for Python 3.6.
 
 0.1.0 (2022-10-28)
 ------------------
