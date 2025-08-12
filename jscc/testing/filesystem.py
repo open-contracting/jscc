@@ -7,17 +7,17 @@ from fnmatch import fnmatch
 from io import StringIO
 
 untracked = {
-    '*.egg-info',
-    '.tox',
-    '.ve',
-    '.venv',
-    'htmlcov',
-    'node_modules',
-    'vendor',
+    "*.egg-info",
+    ".tox",
+    ".ve",
+    ".venv",
+    "htmlcov",
+    "node_modules",
+    "vendor",
 }
 
 
-def walk(top=None, excluded=('.git', '.ve', '.venv', '_static', 'build', 'fixtures')):
+def walk(top=None, excluded=(".git", ".ve", ".venv", "_static", "build", "fixtures")):
     """
     Walk a directory tree, and yield tuples consistent of a file path and file name, excluding Git files and
     third-party files under virtual environment, static, build, and test fixture directories (by default).
@@ -45,7 +45,7 @@ def walk_json_data(patch=None, **kwargs):
     :param function patch: a method that accepts text, and returns modified text.
     """
     for path, name in walk(**kwargs):
-        if path.endswith('.json'):
+        if path.endswith(".json"):
             with open(path) as f:
                 text = f.read()
                 if text:
@@ -64,8 +64,8 @@ def walk_csv_data(**kwargs):
     Accepts the same keyword arguments as :meth:`jscc.testing.filesystem.walk`.
     """
     for path, name in walk(**kwargs):
-        if path.endswith('.csv'):
-            with open(path, newline='') as f:
+        if path.endswith(".csv"):
+            with open(path, newline="") as f:
                 text = f.read()
                 reader = csv.DictReader(StringIO(text))
                 try:

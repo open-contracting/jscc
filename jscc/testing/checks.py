@@ -144,7 +144,7 @@ def get_empty_files(include=_true, **kwargs):
 
     """
     for path, name in walk(**kwargs):
-        if tracked(path) and include(path, name) and name != '__init__.py':
+        if tracked(path) and include(path, name) and name != "__init__.py":
             try:
                 with open(path) as f:
                     text = f.read()
@@ -153,7 +153,7 @@ def get_empty_files(include=_true, **kwargs):
 
             if not text.strip():
                 yield (path,)
-            elif name.endswith('.json'):
+            elif name.endswith(".json"):
                 try:
                     value = json.loads(text)
                     if not value and not isinstance(value, (bool, int, float)):
@@ -183,7 +183,7 @@ def get_misindented_files(include=_true, **kwargs):
     """
     for path, name, text, data in walk_json_data(**kwargs):
         if tracked(path) and include(path, name):
-            expected = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
+            expected = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
             if text != expected:
                 yield (path,)
 
@@ -206,7 +206,7 @@ def get_invalid_json_files(**kwargs):
                             'JSON files are invalid. See warnings below.')
     """
     for path, _ in walk(**kwargs):
-        if path.endswith('.json'):
+        if path.endswith(".json"):
             with open(path) as f:
                 text = f.read()
                 if text:
@@ -230,8 +230,10 @@ def validate_schema(path, data, validator):  # noqa: ARG001 # consistency
 
     for error in validator.iter_errors(data):
         errors += 1
-        warn(f"{json.dumps(error.instance, indent=2)}\n{error.message} ({'/'.join(error.absolute_schema_path)})\n",
-             SchemaWarning)
+        warn(
+            f"{json.dumps(error.instance, indent=2)}\n{error.message} ({'/'.join(error.absolute_schema_path)})\n",
+            SchemaWarning,
+        )
 
     return errors
 
@@ -249,19 +251,20 @@ def validate_letter_case(*args, property_exceptions=(), definition_exceptions=()
     :returns: the number of errors
     :rtype: int
     """
+
     def block(path, data, pointer):
         errors = 0
 
-        parent = pointer.rsplit('/', 1)[-1]
+        parent = pointer.rsplit("/", 1)[-1]
 
-        if parent == 'properties':
+        if parent == "properties":
             for key in data:
-                if not re.search(r'^[a-z][A-Za-z]+$', key) and key not in property_exceptions:
+                if not re.search(r"^[a-z][A-Za-z]+$", key) and key not in property_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} field isn't lowerCamelCase ASCII letters", LetterCaseWarning)
-        elif parent in {'definitions', '$defs'}:
+        elif parent in {"definitions", "$defs"}:
             for key in data:
-                if not re.search(r'^[A-Z][A-Za-z]+$', key) and key not in definition_exceptions:
+                if not re.search(r"^[A-Z][A-Za-z]+$", key) and key not in definition_exceptions:
                     errors += 1
                     warn(f"{path}: {pointer}/{key} block isn't UpperCamelCase ASCII letters", LetterCaseWarning)
 
@@ -283,26 +286,26 @@ def validate_metadata_presence(*args, allow_missing=_false):
     :returns: the number of errors
     :rtype: int
     """
-    schema_fields = {'definitions', '$defs', 'deprecated', 'items', 'patternProperties', 'properties'}
-    schema_sections = {'patternProperties'}
-    required_properties = {'title', 'description'}
+    schema_fields = {"definitions", "$defs", "deprecated", "items", "patternProperties", "properties"}
+    schema_sections = {"patternProperties"}
+    required_properties = {"title", "description"}
 
     def block(path, data, pointer):
         errors = 0
 
-        parts = pointer.rsplit('/')
+        parts = pointer.rsplit("/")
         grandparent = parts[-2] if len(parts) >= 3 else None
         parent = parts[-1]
 
         # Look for metadata fields on user-defined objects only. (Add exceptional condition for "items" field.)
-        if (parent not in schema_fields and grandparent not in schema_sections) or grandparent == 'properties':
+        if (parent not in schema_fields and grandparent not in schema_sections) or grandparent == "properties":
             for prop in required_properties:
                 # If a field has `$ref`, then its `title` and `description` might defer to the reference.
-                if is_missing_property(data, prop) and '$ref' not in data and not allow_missing(pointer):
+                if is_missing_property(data, prop) and "$ref" not in data and not allow_missing(pointer):
                     errors += 1
                     warn(f'{path} is missing "{prop}" at {pointer}', MetadataPresenceWarning)
 
-            if 'type' not in data and '$ref' not in data and 'oneOf' not in data and not allow_missing(pointer):
+            if "type" not in data and "$ref" not in data and "oneOf" not in data and not allow_missing(pointer):
                 errors += 1
                 warn(f'{path} is missing "type" or "$ref" or "oneOf" at {pointer}', MetadataPresenceWarning)
 
@@ -311,8 +314,9 @@ def validate_metadata_presence(*args, allow_missing=_false):
     return _traverse(block)(*args)
 
 
-def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=True, allow_object_null=(),
-                       allow_no_null=(), allow_null=()):
+def validate_null_type(
+    path, data, pointer="", *, no_null=False, expect_null=True, allow_object_null=(), allow_no_null=(), allow_null=()
+):
     """
     Warn and return the number of errors relating to non-nullable optional fields and nullable required fields.
 
@@ -337,9 +341,9 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
     errors = 0
 
     kwargs = {
-        'allow_object_null': allow_object_null,
-        'allow_no_null': allow_no_null,
-        'allow_null': allow_null,
+        "allow_object_null": allow_object_null,
+        "allow_no_null": allow_no_null,
+        "allow_null": allow_null,
     }
 
     if no_null:
@@ -347,11 +351,11 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
 
     if isinstance(data, list):
         for index, item in enumerate(data):
-            errors += validate_null_type(path, item, pointer=f'{pointer}/{index}', **kwargs, no_null=no_null)
+            errors += validate_null_type(path, item, pointer=f"{pointer}/{index}", **kwargs, no_null=no_null)
     elif isinstance(data, dict):
-        if 'type' in data and pointer:
-            null_in_type = 'null' in data['type']
-            null_not_allowed = 'object' in data['type'] or is_array_of_objects(data)
+        if "type" in data and pointer:
+            null_in_type = "null" in data["type"]
+            null_not_allowed = "object" in data["type"] or is_array_of_objects(data)
             # Objects and arrays of objects mustn't be nullable.
             if null_in_type and null_not_allowed and pointer not in allow_object_null:
                 errors += 1
@@ -364,18 +368,20 @@ def validate_null_type(path, data, pointer='', *, no_null=False, expect_null=Tru
                 errors += 1
                 warn(f'{path} includes "null" in "type" at {pointer}', NullTypeWarning)
 
-        required = data.get('required', [])
+        required = data.get("required", [])
 
         for key, value in data.items():
-            if key in {'properties', 'definitions', '$defs'}:
+            if key in {"properties", "definitions", "$defs"}:
                 for k, v in value.items():
-                    expect_null = key == 'properties' and k not in required
-                    errors += validate_null_type(path, v, pointer=f'{pointer}/{key}/{k}', **kwargs, no_null=no_null,
-                                                 expect_null=expect_null)
+                    expect_null = key == "properties" and k not in required
+                    errors += validate_null_type(
+                        path, v, pointer=f"{pointer}/{key}/{k}", **kwargs, no_null=no_null, expect_null=expect_null
+                    )
             else:
-                v = data['items'] if key == 'items' else value
-                errors += validate_null_type(path, v, pointer=f'{pointer}/{key}', **kwargs, no_null=no_null,
-                                             expect_null=key != 'items')
+                v = data["items"] if key == "items" else value
+                errors += validate_null_type(
+                    path, v, pointer=f"{pointer}/{key}", **kwargs, no_null=no_null, expect_null=key != "items"
+                )
 
     return errors
 
@@ -409,53 +415,58 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
     def block(path, data, pointer):
         errors = 0
 
-        parent = pointer.rsplit('/', 1)[-1]
+        parent = pointer.rsplit("/", 1)[-1]
 
-        if 'codelist' in data:
+        if "codelist" in data:
             # `type` can be missing if changing an existing property.
-            types = get_types(data) if 'type' in data else fallback.get(pointer, ['array'])
+            types = get_types(data) if "type" in data else fallback.get(pointer, ["array"])
 
-            if data['openCodelist']:
-                if (('string' in types and 'enum' in data) or ('array' in types and 'enum' in data['items'])):
+            if data["openCodelist"]:
+                if ("string" in types and "enum" in data) or ("array" in types and "enum" in data["items"]):
                     errors += 1
-                    warn(f'{path} sets "enum", though "openCodelist" is true, at {pointer}',
-                         CodelistEnumWarning)
+                    warn(f'{path} sets "enum", though "openCodelist" is true, at {pointer}', CodelistEnumWarning)
             else:
-                if ('string' in types and 'enum' not in data) or ('array' in types and 'enum' not in data['items']):
+                if ("string" in types and "enum" not in data) or ("array" in types and "enum" not in data["items"]):
                     errors += 1
-                    warn(f'{path} is missing "enum", though "openCodelist" is false, at {pointer}',
-                         CodelistEnumWarning)
+                    warn(
+                        f'{path} is missing "enum", though "openCodelist" is false, at {pointer}', CodelistEnumWarning
+                    )
 
                     actual = None
-                elif 'string' in types:
-                    actual = set(data['enum'])
+                elif "string" in types:
+                    actual = set(data["enum"])
                 else:
-                    actual = set(data['items']['enum'])
+                    actual = set(data["items"]["enum"])
 
                 # It'd be faster to cache the CSVs, but most extensions have only one closed codelist.
                 for _, csvname, _, _, rows in walk_csv_data():
                     # The codelist's CSV file must exist.
-                    if csvname == data['codelist']:
+                    if csvname == data["codelist"]:
                         if actual:
-                            expected = {row['Code'] for row in rows}
-                            if 'string' in types and 'null' in types:
+                            expected = {row["Code"] for row in rows}
+                            if "string" in types and "null" in types:
                                 expected.add(None)
 
                             if actual != expected:
                                 added, removed = difference(actual, expected)
 
                                 errors += 1
-                                warn(f"{path}: {pointer}/enum doesn't match codelists/{data['codelist']}"
-                                     f"{added}{removed}", CodelistEnumWarning)
+                                warn(
+                                    f"{path}: {pointer}/enum doesn't match codelists/{data['codelist']}"
+                                    f"{added}{removed}",
+                                    CodelistEnumWarning,
+                                )
                         break
                 else:
                     # When validating a patched schema, the above code will fail to find the core codelists in an
                     # extension, but that is not an error. This overlaps with `validate_schema_codelists_match`.
-                    if not allow_missing(data['codelist']):
+                    if not allow_missing(data["codelist"]):
                         errors += 1
-                        warn(f"{path} refers to missing file codelists/{data['codelist']} at {pointer}",
-                             CodelistEnumWarning)
-        elif ('enum' in data and parent != 'items') or ('items' in data and 'enum' in data['items']):
+                        warn(
+                            f"{path} refers to missing file codelists/{data['codelist']} at {pointer}",
+                            CodelistEnumWarning,
+                        )
+        elif ("enum" in data and parent != "items") or ("items" in data and "enum" in data["items"]):
             if not allow_enum(pointer):
                 errors += 1
                 warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)
@@ -476,10 +487,11 @@ def validate_array_items(*args, allow_invalid=()):
     :returns: the number of errors
     :rtype: int
     """
+
     def block(path, data, pointer):
         errors = 0
 
-        if 'type' in data and 'array' in data['type'] and 'items' not in data and pointer not in allow_invalid:
+        if "type" in data and "array" in data["type"] and "items" not in data and pointer not in allow_invalid:
             errors += 1
             warn(f'{path} is missing "items" at {pointer}', ArrayItemsWarning)
 
@@ -503,9 +515,9 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
     :rtype: int
     """
     valid_types = {
-        'array',
-        'number',
-        'string',
+        "array",
+        "number",
+        "string",
     }
     if additional_valid_types:
         valid_types.update(additional_valid_types)
@@ -513,9 +525,9 @@ def validate_items_type(*args, additional_valid_types=None, allow_invalid=()):
     def block(path, data, pointer):
         errors = 0
 
-        parent = pointer.rsplit('/', 1)[-1]
+        parent = pointer.rsplit("/", 1)[-1]
 
-        if parent == 'items':
+        if parent == "items":
             for _type in get_types(data):
                 if _type not in valid_types and pointer not in allow_invalid:
                     errors += 1
@@ -537,16 +549,17 @@ def validate_deep_properties(*args, allow_deep=()):
     :returns: the number of errors
     :rtype: int
     """
+
     def block(path, data, pointer):
         errors = 0
 
-        parts = pointer.rsplit('/', 2)
+        parts = pointer.rsplit("/", 2)
         grandparent = parts[-2] if len(parts) == 3 else None
 
         if (
             pointer
-            and grandparent not in {'definitions', '$defs'}
-            and 'properties' in data
+            and grandparent not in {"definitions", "$defs"}
+            and "properties" in data
             and pointer not in allow_deep
         ):
             errors += 1
@@ -571,33 +584,34 @@ def validate_object_id(*args, allow_missing=_false, allow_optional=()):
     :returns: the number of errors
     :rtype: int
     """
+
     def block(path, data, pointer):
         errors = 0
 
-        if data.get('wholeListMerge') or data.get('omitWhenMerged') or allow_missing(pointer):
+        if data.get("wholeListMerge") or data.get("omitWhenMerged") or allow_missing(pointer):
             return errors
 
         # If it's an array of objects.
-        if 'type' in data and 'array' in data['type'] and 'properties' in data.get('items', {}):
-            required = data['items'].get('required', [])
+        if "type" in data and "array" in data["type"] and "properties" in data.get("items", {}):
+            required = data["items"].get("required", [])
 
-            original = data['items'].__reference__['$ref'][1:] if hasattr(data['items'], '__reference__') else pointer
+            original = data["items"].__reference__["$ref"][1:] if hasattr(data["items"], "__reference__") else pointer
 
             # See https://standard.open-contracting.org/latest/en/schema/merging/#whole-list-merge
-            if 'id' not in data['items']['properties']:
+            if "id" not in data["items"]["properties"]:
                 errors += 1
                 if original == pointer:
                     warn(f'{path} is missing "id" in "items/properties" at {pointer}', ObjectIdWarning)
                 else:
-                    warn(f'{path} is missing "id" in "items/properties" at {original} (from {pointer})',
-                         ObjectIdWarning)
-            elif 'id' not in required and original not in allow_optional:
+                    warn(
+                        f'{path} is missing "id" in "items/properties" at {original} (from {pointer})', ObjectIdWarning
+                    )
+            elif "id" not in required and original not in allow_optional:
                 errors += 1
                 if original == pointer:
                     warn(f'{path} is missing "id" in "items/required" at {pointer}', ObjectIdWarning)
                 else:
-                    warn(f'{path} is missing "id" in "items/required" at {original} (from {pointer})',
-                         ObjectIdWarning)
+                    warn(f'{path} is missing "id" in "items/required" at {original} (from {pointer})', ObjectIdWarning)
 
         return errors
 
@@ -616,24 +630,26 @@ def validate_merge_properties(*args):
     :returns: the number of errors
     :rtype: int
     """
+
     def block(path, data, pointer):
         errors = 0
 
-        if 'omitWhenMerged' in data and not data['omitWhenMerged']:
+        if "omitWhenMerged" in data and not data["omitWhenMerged"]:
             errors += 1
             warn(f'{path} sets "omitWhenMerged" to false or null at {pointer}', MergePropertiesWarning)
-        if 'wholeListMerge' in data and not data['wholeListMerge']:
+        if "wholeListMerge" in data and not data["wholeListMerge"]:
             errors += 1
             warn(f'{path} sets "wholeListMerge" to false or null at {pointer}', MergePropertiesWarning)
-        elif 'wholeListMerge' in data:
+        elif "wholeListMerge" in data:
             if not is_array_of_objects(data):
                 errors += 1
-                warn(f'{path} sets "wholeListMerge", though the field is not an array of objects, at {pointer}',
-                     MergePropertiesWarning)
-            if 'omitWhenMerged' in data:
+                warn(
+                    f'{path} sets "wholeListMerge", though the field is not an array of objects, at {pointer}',
+                    MergePropertiesWarning,
+                )
+            if "omitWhenMerged" in data:
                 errors += 1
-                warn(f'{path} sets both "omitWhenMerged" and "wholeListMerge" at {pointer}',
-                     MergePropertiesWarning)
+                warn(f'{path} sets both "omitWhenMerged" and "wholeListMerge" at {pointer}', MergePropertiesWarning)
 
         return errors
 
@@ -678,19 +694,19 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
     if not external_codelists:
         external_codelists = set()
 
-    def collect_codelist_values(path, data, pointer=''):
+    def collect_codelist_values(path, data, pointer=""):
         """Collect ``codelist`` values from JSON Schema."""
         codelists = set()
 
         if isinstance(data, list):
             for index, item in enumerate(data):
-                codelists.update(collect_codelist_values(path, item, pointer=f'{pointer}/{index}'))
+                codelists.update(collect_codelist_values(path, item, pointer=f"{pointer}/{index}"))
         elif isinstance(data, dict):
-            if 'codelist' in data:
-                codelists.add(data['codelist'])
+            if "codelist" in data:
+                codelists.add(data["codelist"])
 
             for key, value in data.items():
-                codelists.update(collect_codelist_values(path, value, pointer=f'{pointer}/{key}'))
+                codelists.update(collect_codelist_values(path, value, pointer=f"{pointer}/{key}"))
 
         return codelists
 
@@ -698,13 +714,13 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
 
     codelist_files = set()
     for csvpath, csvname, _, fieldnames, _ in walk_csv_data(top=top):
-        parts = csvpath.replace(top, '').split(os.sep)  # maybe inelegant way to isolate consolidated extension
+        parts = csvpath.replace(top, "").split(os.sep)  # maybe inelegant way to isolate consolidated extension
         # Take all codelists in extensions, all codelists in core, and non-core codelists in profiles.
-        if is_codelist(fieldnames) and ((is_extension and not is_profile) or 'patched' not in parts):
-            if csvname.startswith(('+', '-')):
+        if is_codelist(fieldnames) and ((is_extension and not is_profile) or "patched" not in parts):
+            if csvname.startswith(("+", "-")):
                 if csvname[1:] not in external_codelists:
                     errors += 1
-                    warn(f'{csvname} patches unknown codelist', SchemaCodelistsMatchWarning)
+                    warn(f"{csvname} patches unknown codelist", SchemaCodelistsMatchWarning)
             else:
                 codelist_files.add(csvname)
 
@@ -725,17 +741,17 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
 
 
 def _traverse(block):
-    def method(path, data, pointer=''):
+    def method(path, data, pointer=""):
         errors = 0
 
         if isinstance(data, list):
             for index, item in enumerate(data):
-                errors += method(path, item, pointer=f'{pointer}/{index}')
+                errors += method(path, item, pointer=f"{pointer}/{index}")
         elif isinstance(data, dict):
             errors += block(path, data, pointer)
 
             for key, value in data.items():
-                errors += method(path, value, pointer=f'{pointer}/{key}')
+                errors += method(path, value, pointer=f"{pointer}/{key}")
 
         return errors
 

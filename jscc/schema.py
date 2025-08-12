@@ -1,4 +1,5 @@
 """Methods for interacting with or reasoning about JSON Schema and CSV codelists."""
+
 from collections import UserDict
 from copy import deepcopy
 
@@ -15,7 +16,7 @@ def is_codelist(fieldnames):
     :rtype: bool
     """
     # OCDS uses titlecase. BODS uses lowercase.
-    return 'Code' in fieldnames or 'code' in fieldnames
+    return "Code" in fieldnames or "code" in fieldnames
 
 
 def is_json_schema(data):
@@ -24,7 +25,7 @@ def is_json_schema(data):
     :returns: whether the JSON data is a JSON Schema
     :rtype: bool
     """
-    return '$schema' in data or 'definitions' in data or '$defs' in data or 'properties' in data
+    return "$schema" in data or "definitions" in data or "$defs" in data or "properties" in data
 
 
 def is_json_merge_patch(data):
@@ -33,7 +34,7 @@ def is_json_merge_patch(data):
     :returns: whether the JSON data is a JSON Merge Patch
     :rtype: bool
     """
-    return '$schema' not in data and ('definitions' in data or '$defs' in data or 'properties' in data)
+    return "$schema" not in data and ("definitions" in data or "$defs" in data or "properties" in data)
 
 
 def is_array_of_objects(field):
@@ -42,7 +43,7 @@ def is_array_of_objects(field):
     :returns: whether a field is an array of objects
     :rtype: bool
     """
-    return 'array' in field.get('type', []) and any(key in field.get('items', {}) for key in ('$ref', 'properties'))
+    return "array" in field.get("type", []) and any(key in field.get("items", {}) for key in ("$ref", "properties"))
 
 
 def is_missing_property(field, prop):
@@ -52,8 +53,11 @@ def is_missing_property(field, prop):
     :returns: whether a field's property isn't set, is empty, or is whitespace
     :rtype: bool
     """
-    return prop not in field or (not field[prop] and not isinstance(field[prop], (bool, int, float))) or \
-        (isinstance(field[prop], str) and not field[prop].strip())
+    return (
+        prop not in field
+        or (not field[prop] and not isinstance(field[prop], (bool, int, float)))
+        or (isinstance(field[prop], str) and not field[prop].strip())
+    )
 
 
 def get_types(field):
@@ -64,11 +68,11 @@ def get_types(field):
     :returns: a field's "type"
     :rtype: list
     """
-    if 'type' not in field:
+    if "type" not in field:
         return []
-    if isinstance(field['type'], str):
-        return [field['type']]
-    return field['type']
+    if isinstance(field["type"], str):
+        return [field["type"]]
+    return field["type"]
 
 
 def extend_schema(basename, schema, metadata, codelists=None):
@@ -94,13 +98,14 @@ def extend_schema(basename, schema, metadata, codelists=None):
     :returns: the patched schema
     :rtype: dict
     """
+
     def recurse(metadata):
-        for metadata_url in metadata.get('dependencies', []) + metadata.get('testDependencies', []):
+        for metadata_url in metadata.get("dependencies", []) + metadata.get("testDependencies", []):
             patch_url = f"{metadata_url.rsplit('/', 1)[0]}/{basename}"
             metadata = http_get(metadata_url).json()
             patch = http_get(patch_url).json()
             if codelists is not None:
-                codelists.update(metadata.get('codelists', []))
+                codelists.update(metadata.get("codelists", []))
             json_merge_patch.merge(patched, patch)
             recurse(metadata)
 

@@ -50,10 +50,10 @@ def difference(actual, expected):
     :param set expected: the expected set
     """
     added = actual - expected
-    added = f'; added {added}' if added else ''
+    added = f"; added {added}" if added else ""
 
     removed = expected - actual
-    removed = f'; removed {removed}' if removed else ''
+    removed = f"; removed {removed}" if removed else ""
 
     return added, removed
 
@@ -68,7 +68,7 @@ def warn_and_assert(paths, warn_message, assert_message):
     """
     success = True
     for args in paths:
-        warnings.warn('ERROR: ' + warn_message.format(*args))
+        warnings.warn("ERROR: " + warn_message.format(*args))
         success = False
 
     assert success, assert_message  # noqa: S101 # false positive
