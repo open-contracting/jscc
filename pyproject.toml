@@ -31,7 +31,6 @@ test = [
     "coverage",
     "jsonschema",
     "pytest",
-    "pytest-recording",
 ]
 
 [tool.setuptools.packages.find]

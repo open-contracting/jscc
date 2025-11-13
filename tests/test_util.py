@@ -13,7 +13,6 @@ def test_http_head(meth):
     meth.assert_called_once()
 
 
-@pytest.mark.vcr
 def test_http_head_error():
     with pytest.raises(requests.HTTPError):
         http_head("http://httpbin.org/status/400")
@@ -26,7 +25,6 @@ def test_http_get(meth):
     meth.assert_called_once()
 
 
-@pytest.mark.vcr
 def test_http_get_error():
     with pytest.raises(requests.HTTPError):
         http_get("http://httpbin.org/status/400")
