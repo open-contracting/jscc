@@ -4,15 +4,19 @@ Changelog
 Unreleased
 ----------
 
+Added
+~~~~~
+
+-  Add support for Python 3.13, 3.14.
+
 Fixed
 ~~~~~
 
 -  Use the new ``ArrayItemsWarning`` warning, instead of the incorrect ``DeepPropertiesWarning`` warning, in :meth:`jscc.testing.checks.validate_array_items`.
 
-Changed
-~~~~~~~
+Removed
+~~~~~~~~
 
--  Add support for Python 3.13, 3.14.
 -  Drop support for Python 3.9.
 
 0.3.0 (2024-09-15)
@@ -28,6 +32,9 @@ Changed
    -  :meth:`jscc.testing.checks.validate_schema_codelists_match`
    -  :meth:`jscc.testing.checks.test_validate_codelist_enum`
 
+Removed
+~~~~~~~
+
 -  Drop support for Python 3.8.
 
 0.2.4 (2024-01-29)
@@ -37,6 +44,10 @@ Changed
 ~~~~~~~
 
 -  :meth:`jscc.testing.checks.validate_ref` accepts keyword arguments to pass to ``jsonref.replace_refs``.
+
+Removed
+~~~~~~~
+
 -  Drop support for Python 3.7.
 
 0.2.3 (2023-07-06)
@@ -103,7 +114,7 @@ Fixed
 
 -  :meth:`jscc.testing.checks.get_empty_files` correctly returns JSON files that are whitespace only.
 
-Changed
+Removed
 ~~~~~~~
 
 -  Drop support for Python 3.6.
