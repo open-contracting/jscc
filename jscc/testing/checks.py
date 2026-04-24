@@ -286,7 +286,16 @@ def validate_metadata_presence(*args, allow_missing=_false):
     :returns: the number of errors
     :rtype: int
     """
-    schema_fields = {"definitions", "$defs", "deprecated", "items", "patternProperties", "properties"}
+    schema_fields = {
+        "$defs",
+        "additionalProperties",
+        "definitions",
+        "deprecated",
+        "items",
+        "patternProperties",
+        "properties",
+        "propertyNames",
+    }
     schema_sections = {"patternProperties"}
     required_properties = {"title", "description"}
 

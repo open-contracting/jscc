@@ -12,7 +12,8 @@ Added
 Fixed
 ~~~~~
 
--  Use the new ``ArrayItemsWarning`` warning, instead of the incorrect ``DeepPropertiesWarning`` warning, in :meth:`jscc.testing.checks.validate_array_items`.
+-  :meth:`jscc.testing.checks.validate_metadata_presence`: Recognize ``additionalProperties`` and ``propertyNames`` as keywords.
+-  :meth:`jscc.testing.checks.validate_array_items`: Use the new ``ArrayItemsWarning`` warning, instead of the incorrect ``DeepPropertiesWarning`` warning.
 -  Break cycles in recursive schemas.
 
 Removed
