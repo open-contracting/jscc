@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jscc"
-version = "0.3.0"
+version = "0.4.0"
 authors = [{name = "Open Contracting Partnership and Open Data Services Co-operative Limited", email = "data@open-contracting.org"}]
 description = "Tools for data standards that use JSON Schema and CSV codelists"
 readme = "README.rst"

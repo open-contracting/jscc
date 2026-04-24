@@ -15,7 +15,7 @@ project = "JSON Schema and CSV Codelists"
 copyright = "2020, Open Contracting Partnership and Open Data Services Co-operative Limited"
 author = "Open Contracting Partnership and Open Data Services Co-operative Limited"
 
-version = "0.2.4"
+version = "0.4.0"
 release = version
 
 # -- General configuration ---------------------------------------------------
