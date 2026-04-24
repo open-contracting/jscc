@@ -741,17 +741,18 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
 
 
 def _traverse(block):
-    def method(path, data, pointer=""):
+    def method(path, data, pointer="", ancestors=()):
         errors = 0
 
         if isinstance(data, list):
             for index, item in enumerate(data):
-                errors += method(path, item, pointer=f"{pointer}/{index}")
-        elif isinstance(data, dict):
+                errors += method(path, item, pointer=f"{pointer}/{index}", ancestors=ancestors)
+        elif isinstance(data, dict) and id(data) not in ancestors:
+            ancestors = (*ancestors, id(data))
             errors += block(path, data, pointer)
 
             for key, value in data.items():
-                errors += method(path, value, pointer=f"{pointer}/{key}")
+                errors += method(path, value, pointer=f"{pointer}/{key}", ancestors=ancestors)
 
         return errors
 
