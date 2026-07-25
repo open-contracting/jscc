@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.5.0 (2026-07-24)
+------------------
+
+Changed
+~~~~~~~
+
+-  Yield file paths as :class:`pathlib.Path` objects, instead of :class:`str`, in:
+
+   -  :meth:`jscc.testing.filesystem.walk`
+   -  :meth:`jscc.testing.filesystem.walk_json_data`
+   -  :meth:`jscc.testing.filesystem.walk_csv_data`
+   -  :meth:`jscc.testing.checks.get_empty_files`
+   -  :meth:`jscc.testing.checks.get_misindented_files`
+   -  :meth:`jscc.testing.checks.get_invalid_json_files`
+
 0.4.0 (2026-04-24)
 ------------------
 

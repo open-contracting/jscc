@@ -87,7 +87,6 @@ You can monkeypatch ``warnings.formatwarning`` to customize and abbreviate the w
 # as strings. Therefore, we use strings instead of tuples.
 
 import json
-import os
 import re
 from warnings import warn
 
@@ -146,7 +145,7 @@ def get_empty_files(include=_true, **kwargs):
     for path, name in walk(**kwargs):
         if tracked(path) and include(path, name) and name != "__init__.py":
             try:
-                with open(path) as f:
+                with path.open() as f:
                     text = f.read()
             except UnicodeDecodeError:
                 continue  # the file is non-empty, and might be binary
@@ -206,8 +205,8 @@ def get_invalid_json_files(**kwargs):
                             'JSON files are invalid. See warnings below.')
     """
     for path, _ in walk(**kwargs):
-        if path.endswith(".json"):
-            with open(path) as f:
+        if path.suffix == ".json":
+            with path.open() as f:
                 text = f.read()
                 if text:
                     try:
@@ -723,7 +722,7 @@ def validate_schema_codelists_match(path, data, top, *, is_extension=False, is_p
 
     codelist_files = set()
     for csvpath, csvname, _, fieldnames, _ in walk_csv_data(top=top):
-        parts = csvpath.replace(top, "").split(os.sep)  # maybe inelegant way to isolate consolidated extension
+        parts = csvpath.relative_to(top).parts  # isolate consolidated extension
         # Take all codelists in extensions, all codelists in core, and non-core codelists in profiles.
         if is_codelist(fieldnames) and ((is_extension and not is_profile) or "patched" not in parts):
             if csvname.startswith(("+", "-")):

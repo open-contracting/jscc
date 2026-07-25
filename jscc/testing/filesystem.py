@@ -5,6 +5,7 @@ import json
 import os
 from fnmatch import fnmatch
 from io import StringIO
+from pathlib import Path
 
 untracked = {
     "*.egg-info",
@@ -22,18 +23,18 @@ def walk(top=None, excluded=(".git", ".ve", ".venv", "_static", "build", "fixtur
     Walk a directory tree, and yield tuples consistent of a file path and file name, excluding Git files and
     third-party files under virtual environment, static, build, and test fixture directories (by default).
 
-    :param str top: the file path of the directory tree
+    :param top: the file path of the directory tree
     :param tuple exclude: override the directories to exclude
     """
     if not top:
-        top = os.getcwd()
+        top = Path.cwd()
 
     for root, dirs, files in os.walk(top):
         for directory in excluded:
             if directory in dirs:
                 dirs.remove(directory)
         for name in files:
-            yield os.path.join(root, name), name
+            yield Path(root) / name, name
 
 
 def walk_json_data(patch=None, **kwargs):
@@ -45,8 +46,8 @@ def walk_json_data(patch=None, **kwargs):
     :param function patch: a method that accepts text, and returns modified text.
     """
     for path, name in walk(**kwargs):
-        if path.endswith(".json"):
-            with open(path) as f:
+        if path.suffix == ".json":
+            with path.open() as f:
                 text = f.read()
                 if text:
                     if patch:
@@ -64,8 +65,8 @@ def walk_csv_data(**kwargs):
     Accepts the same keyword arguments as :meth:`jscc.testing.filesystem.walk`.
     """
     for path, name in walk(**kwargs):
-        if path.endswith(".csv"):
-            with open(path, newline="") as f:
+        if path.suffix == ".csv":
+            with path.open(newline="") as f:
                 text = f.read()
                 reader = csv.DictReader(StringIO(text))
                 try:
@@ -80,6 +81,6 @@ def tracked(path):
     """
     Return whether the path isn't typically untracked in Git repositories.
 
-    :param str path: a file path
+    :param path: a file path
     """
-    return not any(fnmatch(part, pattern) for pattern in untracked for part in path.split(os.sep))
+    return not any(fnmatch(part, pattern) for pattern in untracked for part in Path(path).parts)

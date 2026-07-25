@@ -2,6 +2,7 @@ import contextlib
 import json
 import os
 import warnings
+from pathlib import Path
 
 import jsonref
 import pytest
@@ -38,7 +39,7 @@ from tests import parse, path
 
 @contextlib.contextmanager
 def chdir(path):
-    cwd = os.getcwd()
+    cwd = Path.cwd()
     os.chdir(path)
     try:
         yield
@@ -52,7 +53,7 @@ def t(message):
 
 
 def validate(name, *args, **kwargs):
-    filepath = os.path.join("schema", f"{name}.json")
+    filepath = Path("schema") / f"{name}.json"
     return getattr(jscc.testing.checks, "validate_" + name)(path(filepath), parse(filepath), *args, **kwargs)
 
 
@@ -61,7 +62,7 @@ def test_get_empty_files():
     with chdir(directory):
         paths = set()
         for result in get_empty_files():
-            paths.add(result[0].replace(directory, ""))
+            paths.add(str(result[0]).replace(directory, ""))
 
             assert len(result) == 1
 
@@ -80,7 +81,7 @@ def test_get_misindented_files():
     with chdir(directory):
         paths = set()
         for result in get_misindented_files():
-            paths.add(result[0].replace(directory, ""))
+            paths.add(str(result[0]).replace(directory, ""))
 
             assert len(result) == 1
 
@@ -96,7 +97,7 @@ def test_get_invalid_json_files():
     with chdir(directory):
         results = {}
         for result in get_invalid_json_files():
-            results[result[0].replace(directory, "")] = result[1]
+            results[str(result[0]).replace(directory, "")] = result[1]
 
             assert len(result) == 2
 
@@ -113,8 +114,8 @@ def test_get_invalid_json_files():
 def test_validate_codelist_enum():
     directory = os.path.realpath(path("schema")) + os.sep
 
-    filepath = os.path.join(directory, "codelist_enum.json")
-    with open(filepath) as f:
+    filepath = Path(directory) / "codelist_enum.json"
+    with filepath.open() as f:
         data = json.load(f)
 
     with chdir(directory), pytest.warns(CodelistEnumWarning) as records:
@@ -247,7 +248,7 @@ def test_validate_object_id():
     def allow_missing(pointer):
         return pointer == "/properties/allowMissing"
 
-    filepath = os.path.join("schema", "object_id.json")
+    filepath = Path("schema") / "object_id.json"
     with pytest.warns(ObjectIdWarning) as records:
         errors = validate_object_id(
             path(filepath),
@@ -272,7 +273,7 @@ def test_validate_object_id():
 
 
 def test_validate_ref_pass():
-    filepath = os.path.join("schema", "schema.json")
+    filepath = Path("schema") / "schema.json"
 
     with warnings.catch_warnings():
         warnings.simplefilter("error")  # no warnings
@@ -307,7 +308,7 @@ def test_validate_schema():
 
 
 def test_validate_schema_codelists_match():
-    filepath = os.path.join("schema", "codelist_enum.json")
+    filepath = Path("schema") / "codelist_enum.json"
     with pytest.warns(SchemaCodelistsMatchWarning) as records:
         errors = validate_schema_codelists_match(path(filepath), parse(filepath), path("schema"))
 
@@ -320,7 +321,7 @@ def test_validate_schema_codelists_match():
 
 
 def test_validate_schema_codelists_match_codelist():
-    filepath = os.path.join("schema", "codelist_enum.json")
+    filepath = Path("schema") / "codelist_enum.json"
     with pytest.warns(SchemaCodelistsMatchWarning) as records:
         errors = validate_schema_codelists_match(
             path(filepath),

@@ -1,16 +1,15 @@
 import json
-import os.path
+from pathlib import Path
 
 
 def path(filename):
-    return os.path.join("tests", "fixtures", filename)
+    return Path("tests") / "fixtures" / filename
 
 
 def read(filename):
-    with open(path(filename)) as f:
-        return f.read()
+    return path(filename).read_text()
 
 
 def parse(filename):
-    with open(path(filename)) as f:
+    with path(filename).open() as f:
         return json.load(f)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jscc"
-version = "0.4.0"
+version = "0.5.0"
 authors = [{name = "Open Contracting Partnership and Open Data Services Co-operative Limited", email = "data@open-contracting.org"}]
 description = "Tools for data standards that use JSON Schema and CSV codelists"
 readme = "README.rst"
@@ -51,7 +51,6 @@ ignore = [
     "B028",  # warnings
     "D100", "D101", "D104", "D205",
     "PLR2004",  # magic
-    "PTH",
 ]
 
 [tool.ruff.lint.flake8-builtins]

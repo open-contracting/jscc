@@ -25,7 +25,7 @@ from tests import parse, path
     ],
 )
 def test_is_codelist(filename, expected):
-    with open(path(filename)) as f:
+    with path(filename).open() as f:
         reader = csv.DictReader(f)
 
         assert is_codelist(reader.fieldnames) == expected
