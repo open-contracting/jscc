@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+Removed
+~~~~~~~
+
+-  Drop support for Python 3.10.
+
 0.5.0 (2026-07-24)
 ------------------
 
