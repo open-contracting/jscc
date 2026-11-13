@@ -474,10 +474,11 @@ def validate_codelist_enum(*args, fallback=None, allow_enum=_false, allow_missin
                             f"{path} refers to missing file codelists/{data['codelist']} at {pointer}",
                             CodelistEnumWarning,
                         )
-        elif ("enum" in data and parent != "items") or ("items" in data and "enum" in data["items"]):
-            if not allow_enum(pointer):
-                errors += 1
-                warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)
+        elif (
+            ("enum" in data and parent != "items") or ("items" in data and "enum" in data["items"])
+        ) and not allow_enum(pointer):
+            errors += 1
+            warn(f'{path} is missing "codelist" and "openCodelist" at {pointer}', CodelistEnumWarning)
 
         return errors
 
